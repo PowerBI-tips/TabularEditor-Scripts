@@ -1,4 +1,4 @@
-# Tabulr Editor Scripts
+# Tabular Editor Scripts
 Community repository for sharing and discussing scripts for use with Tabular Editor. Originally forked from [TabularEditor Scripts](https://github.com/TabularEditor/Scripts).
 
 ## Using scripts from this repository
