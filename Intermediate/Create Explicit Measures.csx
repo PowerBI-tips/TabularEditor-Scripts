@@ -8,7 +8,7 @@
 // This script can create a lot of measures, as by default the aggregation function for columns with a numeric data type is SUM.
 // So, it is a good idea to check all columns for the proper aggregation type, e.g. the aggregation type of id columns 
 // should be set to None, as it does not make any sense to aggregate id columns.
-// An annotation:CreatedThrough is created with a value:CreateExplicitMeasures this will help to identify the measures createed
+// An annotation:CreatedThrough is created with a value:CreateExplicitMeasures this will help to identify the measures created
 // using this script.
 // What is missing, the list below shows what might be coming in subsequent iterations of the script:
 // - the base column property hidden is not set to true
@@ -139,7 +139,7 @@ foreach( var t in Model.Tables ) {
                     , "" + useAggFunction.ToString().ToUpper() + "(" + c.DaxObjectFullName + ")"        // DAX expression
                 );
                 
-                newMeasure.SetAnnotation( "CreatedThrough" , "CreateExplicitMeasures" ); // flag the measures created throught this script
+                newMeasure.SetAnnotation( "CreatedThrough" , "CreateExplicitMeasures" ); // flag the measures created through this script
                 
             }
         }    

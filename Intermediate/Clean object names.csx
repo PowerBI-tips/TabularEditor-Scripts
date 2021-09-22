@@ -25,7 +25,7 @@ var rex = new System.Text.RegularExpressions.Regex( "(^[a-z]+|[A-Z]+(?![a-z])|[A
 // if any of the following are the first word of a table name they will be stripped out
 List<string> tablePrefixesToIgnore = new List<string>() {"dim","fact", "vw","tbl","vd","td","tf","vf"};
 
-// if any of the following ar ethe last word of a table name they will be stripped out
+// if any of the following are the last word of a table name they will be stripped out
 List<string> tableSuffixesToIgnore = new List<string>() {"dim", "fact"};
 
 foreach (var tbl in Model.Tables) 

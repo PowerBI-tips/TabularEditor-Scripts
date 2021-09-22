@@ -1,11 +1,11 @@
 /*
- * Generate time intelligence measures based on calculation group items alredy created
+ * Generate time intelligence measures based on calculation group items already created
  *
  * Author: Benoit Fedit, https://datakuity.com/ 
  *
  * You must have created the calculation group items beforehand (see link below)
  * https://docs.microsoft.com/en-us/analysis-services/tabular-models/calculation-groups?view=asallproducts-allversions
- * To add more measure simply copy/paste the YTD script and replace YTD by your claculation item name
+ * To add more measure simply copy/paste the YTD script and replace YTD by your calculation item name
  */
 
 

@@ -10,10 +10,14 @@
 foreach(var c in Selected.Columns)
 {
 var newMeasure = c.Table.AddMeasure(
-        "drtext_" + c.Name,                    // Name
-"IF(SELECTEDVALUE(" + c.DaxObjectFullName  + "),0 == 0, \"Click a Company to See Details","See details for \" SELECTEDVALUE(" + c.DaxObjectFullName + "))"
+  
+  // Appends a prefix to the name of the column
+  "dr_text_" + c.Name ,
 
-                        // Display Folder;
-);
+  // Generate full measure
+  "IF(SELECTEDVALUE(" + c.DaxObjectFullName  + "),0 == 0, \"Click a Company to See Details","See details for \" SELECTEDVALUE(" + c.DaxObjectFullName + "))"
+  );
+
+  // Display Folder;
   newMeasure.DisplayFolder = "_Sel";  
 }

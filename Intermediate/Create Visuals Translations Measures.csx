@@ -22,7 +22,8 @@ var Measures_prefix = "AT_";
 var Method = "SLICER";
 
 
-// Optionally select the file manually 
+// Optionally select the file manually (Comment code below to use)
+
 // using (var openFileDialog = new System.Windows.Forms.OpenFileDialog()) {
 //    openFileDialog.Title = "Select a visuals labels file to load";
 //    if (System.IO.File.Exists(Visuals_labels_file)){
@@ -39,6 +40,7 @@ var Method = "SLICER";
 //        Visuals_labels_file = "";
 //    }
 // }
+
 
 // If file exists
 if (System.IO.File.Exists(Visuals_labels_file)) { 

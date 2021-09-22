@@ -9,10 +9,14 @@
 foreach(var c in Selected.Columns)
 {
 var newMeasure = c.Table.AddMeasure(
-        "Sel. " + c.Name,                    // Name
-"IF(ISFILTERED(" + c.DaxObjectFullName  + "), SELECTEDVALUE(" + c.DaxObjectFullName + ", \" Mulitple Selected \"  ),  \"None Selected \" )"   
 
-                        // Display Folder
-    );
+  // Create name of measure using a prefix
+  "Sel. " + c.Name,
+
+  // Create full measure
+  "IF(ISFILTERED(" + c.DaxObjectFullName  + "), SELECTEDVALUE(" + c.DaxObjectFullName + ", \" Multiple Selected \"  ),  \"None Selected \" )"
+  );
+  
+  // Display Folder
   newMeasure.DisplayFolder = "_Sel";  
 }
