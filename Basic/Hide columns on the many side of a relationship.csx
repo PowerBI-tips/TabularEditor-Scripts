@@ -9,6 +9,7 @@
  */
 
 // Hide all columns on many side of a join
+
 foreach (var r in Model.Relationships)
 { // hide all columns on the many side of a join
     var c = r.FromColumn.Name;

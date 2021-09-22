@@ -4,7 +4,7 @@
 // 
 // This script, when executed, will loop through all the tables and creates explicit measure for all the columns with qualifying
 // aggregation functions.
-// The qualifiyng aggregation functions are SUM, COUNT, MIN, MAX, AVERAGE.
+// The qualifying aggregation functions are SUM, COUNT, MIN, MAX, AVERAGE.
 // This script can create a lot of measures, as by default the aggregation function for columns with a numeric data type is SUM.
 // So, it is a good idea to check all columns for the proper aggregation type, e.g. the aggregation type of id columns 
 // should be set to None, as it does not make any sense to aggregate id columns.
