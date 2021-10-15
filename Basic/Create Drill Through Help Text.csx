@@ -18,7 +18,7 @@ var newMeasure = c.Table.AddMeasure(
   //"IF(SELECTEDVALUE(" + c.DaxObjectFullName  + ", \"Click a Company to See Details\" ), \"See details for \" & SELECTEDVALUE(" + c.DaxObjectFullName + "))"
  // );
   
-  //"IF(HASONEVALUE(" + c.DaxObjectFullName  + "), \"See details for \" & SELECTEDVALUE(" + c.DaxObjectFullName + "), \"Click a Company to See Details\" )"
+  "IF(HASONEVALUE(" + c.DaxObjectFullName  + "), \"See details for \" & SELECTEDVALUE(" + c.DaxObjectFullName + "), \"Click a Company to See Details\" )"
 
   // Display Folder;
   newMeasure.DisplayFolder = "_Sel";  
