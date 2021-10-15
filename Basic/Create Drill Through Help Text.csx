@@ -15,8 +15,10 @@ var newMeasure = c.Table.AddMeasure(
   "dr_text_" + c.Name ,
 
   // Generate full measure
-  "IF(SELECTEDVALUE(" + c.DaxObjectFullName  + "),0 == 0, \"Click a Company to See Details","See details for \" SELECTEDVALUE(" + c.DaxObjectFullName + "))"
-  );
+  //"IF(SELECTEDVALUE(" + c.DaxObjectFullName  + ", \"Click a Company to See Details\" ), \"See details for \" & SELECTEDVALUE(" + c.DaxObjectFullName + "))"
+ // );
+  
+  //"IF(HASONEVALUE(" + c.DaxObjectFullName  + "), \"See details for \" & SELECTEDVALUE(" + c.DaxObjectFullName + "), \"Click a Company to See Details\" )"
 
   // Display Folder;
   newMeasure.DisplayFolder = "_Sel";  
