@@ -1,5 +1,5 @@
 /*
- * Title: Add Prefix to Selected Measures
+ * Title: Set Summarize by to None on Selected Columns
  *
  * Author: Mike Carlo, https://PowerBI.tips
  *
