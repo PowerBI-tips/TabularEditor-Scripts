@@ -7,11 +7,19 @@
 // REFERENCE: 
 // based on this article https://www.daxpatterns.com/standard-time-related-calculations/
 // 
-// use this to creqte YtD, PY YtD, and YOY based on same period in the current year
-
+// use this to create YtD, PY YtD, and YOY based on same period in the current year
+//
 //AT LEAST ONE MEASURE HAS TO BE AFFECTED!, 
 //either by selecting it or typing its name in the preSelectedMeasures Variable
-
+// CONFIGURATION:
+//   1. Update the values from the comments (prefactTableName - predateTableYearColumnName) if you want the script to auto run based on set table
+//   column names.
+//   2. You Should put  in prefactTableName, the name of the fact table only. Then the column where date is in the fact table, etc. 
+//   3. When you run the script, YOU MUST SELECT AT LEAST ONE MEASURE.
+//   4. Running the script will show a pop up to enter in the Display Folder you want to group all of the selected measures
+//   5. The next pop up will ask you if you want to choose the tables, columns manually or use what is pre-configured in the code. Note if you
+//	choose "N" (default) and there are no value filled in the variables below, it will not work.
+//	Let it Run! 
  
 string[] preSelectedMeasures = {}; //include measure names in double quotes, like: {"Profit","Total Cost"};
 string prefactTableName = "afactOrderDetails";
