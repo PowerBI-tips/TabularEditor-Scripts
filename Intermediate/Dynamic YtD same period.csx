@@ -9,7 +9,7 @@ using Microsoft.VisualBasic;
 // REFERENCE: 
 // based on this article https://www.daxpatterns.com/standard-time-related-calculations/
 // 
-// use this to creqte YtD, PY YtD, and YOY based on same period in the current year
+// use this to create YtD, PY YtD, and YOY based on same period in the current year
 
 //AT LEAST ONE MEASURE HAS TO BE AFFECTED!, 
 //either by selecting it or typing its name in the preSelectedMeasures Variable
@@ -40,7 +40,7 @@ string ADYname = "ADY";
 string ShowValueForDatesMeasureName = "ShowValueForDates";
 string dateTableNameV = dateTableName;
 
-// string ValueSelected = Interaction.InputBox("Choose if you want to Select", "Select Columns", "Y");
+ string ValueSelected = Interaction.InputBox("Choose if you want to Select", "Select Columns", "Y");
 string ValueSelected = "N";
 if (ValueSelected == "N") {
 	var factTablea = Model.Tables[factTableName];
