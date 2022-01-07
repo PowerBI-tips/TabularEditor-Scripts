@@ -1,3 +1,5 @@
+#r "Microsoft.VisualBasic"
+using Microsoft.VisualBasic;
 //
 //
 // by Tommy Puglia
@@ -12,10 +14,12 @@
 //AT LEAST ONE MEASURE HAS TO BE AFFECTED!, 
 //either by selecting it or typing its name in the preSelectedMeasures Variable
 
- 
+string DisplayFolderName = Interaction.InputBox("Provide the name of the Display Folder", "Display", "KPI");
+if (DisplayFolderName == "") return;
+
 string[] preSelectedMeasures = {}; //include measure names in double quotes, like: {"Profit","Total Cost"};
-string prefactTableName = "afactOrderDetails";
-string prefactTableDateColumnName = "Payment_Date";
+string prefactTableName = "afactKiboMerge";
+string prefactTableDateColumnName = "PaymentDate";
 string predateTableName = "DimDateDF";
 string predateTableDateColumnName = "FullDate";
 string predateTableYearColumnName = "Calendar Year";
@@ -27,161 +31,79 @@ string[] AllDATES = {
 	predateTableDateColumnName,
 	predateTableYearColumnName
 };
-string factTableName = string.Empty;
-string factTableDateColumnName = string.Empty;
-string factDateColumnWithTable = string.Empty;
-string dateTableName = string.Empty;
-string dateTableDateColumnName = string.Empty;
-string dateTableYearColumnName = string.Empty;
-string dateColumnWithTable = string.Empty;
-string ShowValueForDatesMeasureName = string.Empty;
-string dateWithSalesColumnName = string.Empty;
-// string dateTable;
-
-// Select Tables
-var factTable = SelectTable(label: "Select your fact table");
-if (factTable == null) return;
-var factTableDateColumn = SelectColumn(factTable.Columns, label: "Select the main date column");
-if (factTableDateColumn == null) return;
-
-var dateTable = SelectTable(label: "Select your date table");
-if (dateTable == null) {
-	Error("You just aborted the script");
-	return;
-} else {
-
-	dateTable.SetAnnotation("@AgulloBernat", "Time Intel Date Table");
-};
-ShowValueForDatesMeasureName = "ShowValueForDates";
-dateWithSalesColumnName = "DateWith" + factTable.Name;
+string factTableName = prefactTableName;
+string dateTableName = predateTableName;
+string factTableDateColumnName = prefactTableDateColumnName;
+string dateTableDateColumnName = predateTableDateColumnName;
+string dateTableYearColumnName = predateTableYearColumnName;
 string ADYname = "ADY";
-var dateTableDateColumn = SelectColumn(dateTable.Columns, label: "Select the date column");
-if (dateTableDateColumn == null) {
-	Error("You just aborted the script");
-	return;
+string ShowValueForDatesMeasureName = "ShowValueForDates";
+string dateTableNameV = dateTableName;
+
+// string ValueSelected = Interaction.InputBox("Choose if you want to Select", "Select Columns", "Y");
+string ValueSelected = "N";
+if (ValueSelected == "N") {
+	var factTablea = Model.Tables[factTableName];
+	var dateTablea = Model.Tables[dateTableName];
+
+	var  = Model.Tables[factTableName].Columns[factTableDateColumnName];
+
+	var dateTableDateColumn = Model.Tables[dateTableName].Columns[dateTableDateColumnName];
+	var dateTableYearColumn = Model.Tables[dateTableName].Columns[dateTableYearColumnName];
 } else {
-	dateTableDateColumn.SetAnnotation("@AgulloBernat", "Time Intel Date Table Date Column");
-};
+	// Select Tables
+	var factTablen = SelectTable(label: "Select your fact table");
+	if (factTablen == null) return;
+	var factTableDateColumn = SelectColumn(factTablen.Columns, label: "Select the main date column");
+	if (factTableDateColumn == null) return;
 
-var dateTableYearColumn = SelectColumn(dateTable.Columns, label: "Select the year column");
-if (dateTableYearColumn == null) return;
-
-//these names are for internal use only, so no need to be super-fancy, better stick to datpatterns.com mode
-factTableName = factTable.Name;
-factTableDateColumnName = factTableDateColumn.Name;
-factDateColumnWithTable = "'" + factTableName + "'[" + factTableDateColumnName + "]";
-dateTableName = dateTable.Name;
-dateTableDateColumnName = dateTableDateColumn.Name;
-dateTableYearColumnName = dateTableYearColumn.Name;
-dateColumnWithTable = "'" + dateTableName + "'[" + dateTableDateColumnName + "]";
-ShowValueForDatesMeasureName = "ShowValueForDates";
-dateWithSalesColumnName = "DateWith" + factTableName;
-
-// The logic
-/*
-int i = 0;
-int b = 0;
-
-for (i = 0; i <  AllDATES.GetLength(0); i++) {
-if(AllDATES[i]  != "") {
- b++;
-};
-};
-
-
-for (i = 0; i < preSelectedMeasures.GetLength(0); i++) {
-
-	if (affectedMeasures == "{") {
-		affectedMeasures = affectedMeasures + "\"" + preSelectedMeasures[i] + "\"";
-	} else {
-		affectedMeasures = affectedMeasures + ",\"" + preSelectedMeasures[i] + "\"";
+	var dateTablen = SelectTable(label: "Select your date table");
+	if (dateTablen == null) {
+		Error("You just aborted the script");
+		return;
 	};
 
-};
-
-if (Selected.Measures.Count != 0) {
-
-	foreach(var m in Selected.Measures) {
-		if (affectedMeasures == "{") {
-			affectedMeasures = affectedMeasures + "\"" + m.Name + "\"";
-		} else {
-			affectedMeasures = affectedMeasures + ",\"" + m.Name + "\"";
-		};
+	var dateTableDateColumn = SelectColumn(dateTablen.Columns, label: "Select the date column");
+	if (dateTableDateColumn == null) {
+		Error("You just aborted the script");
+		return;
 	};
+	var dateTableYearColumn = SelectColumn(dateTablen.Columns, label: "Select the year column");
+	if (dateTableYearColumn == null) return;
+	factTableName = factTablen.Name;
+	factTableDateColumnName = factTableDateColumn.Name;
+	dateTableName = dateTablen.Name;
+	dateTableDateColumnName = dateTableDateColumn.Name;
+	dateTableYearColumnName = dateTableYearColumn.Name;
 };
 
+var factDateColumnWithTableNA = Model.Tables[factTableName].Columns[factTableDateColumnName];
+var dateTable = Model.Tables[dateTableName];
+var factTable = Model.Tables[factTableName];
+var dateColumnWithTableNA = Model.Tables[dateTableName].Columns[dateTableDateColumnName];
+var dateColumnWithTable = dateColumnWithTableNA.DaxObjectFullName;
+var factDateColumnWithTable = factDateColumnWithTableNA.DaxObjectFullName;
 
-//check that by either method at least one measure is affected
-// '2021-09-24 / B.Agullo / model object selection prompts! 
-
-if(b == 0)
-{
-var factTable = SelectTable(label: "Select your fact table");
-if (factTable == null) return;
-var factTableDateColumn = SelectColumn(factTable.Columns, label: "Select the main date column");
-if (factTableDateColumn == null) return;
-
-var vdateTable = SelectTable(label: "Select your date table");
-if (vdateTable == null) {
-	Error("You just aborted the script");
-	return;
-} else {
-dateTable = vdateTable;
-	dateTable.SetAnnotation("@AgulloBernat", "Time Intel Date Table");
-};
-ShowValueForDatesMeasureName = "ShowValueForDates";
-dateWithSalesColumnName = "DateWith" + factTable.Name;
-string ADYname = "ADY";
-var dateTableDateColumn = SelectColumn(dateTable.Columns, label: "Select the date column");
-if (dateTableDateColumn == null) {
-	Error("You just aborted the script");
-	return;
-} else {
-	dateTableDateColumn.SetAnnotation("@AgulloBernat", "Time Intel Date Table Date Column");
-};
-
-var dateTableYearColumn = SelectColumn(dateTable.Columns, label: "Select the year column");
-if (dateTableYearColumn == null) return;
-
-//these names are for internal use only, so no need to be super-fancy, better stick to datpatterns.com model
-
-
- factTableName = factTable.Name;
- factTableDateColumnName = factTableDateColumn.Name;
- factDateColumnWithTable = "'" + factTableName + "'[" + factTableDateColumnName + "]";
- dateTableName = dateTable.Name;
- dateTableDateColumnName = dateTableDateColumn.Name;
- dateTableYearColumnName = dateTableYearColumn.Name;
- dateColumnWithTable = "'" + dateTableName + "'[" + dateTableDateColumnName + "]";
-} else {
- factTableName = prefactTableName;
-dateTable =  predateTableName;
- factTableDateColumnName = prefactTableDateColumnName;
- factDateColumnWithTable = "'" + factTableName + "'[" + factTableDateColumnName + "]";
- dateTableName = predateTableName;
- dateTableDateColumnName = predateTableDateColumnName;
- dateTableYearColumnName = predateTableYearColumnName;
- dateColumnWithTable = "'" + dateTableName + "'[" + dateTableDateColumnName + "]";
- ShowValueForDatesMeasureName = "ShowValueForDates";
- dateWithSalesColumnName = "DateWith" + factTableName;
-string ADYname = "ADY";
-};
-*/
+string dateWithSalesColumnName = "DateWith" + factTable.Name;
 string DateWithSalesCalculatedColumnExpression = dateColumnWithTable + " <= MAX ( " + factDateColumnWithTable + ")";
-
-dateTable.AddCalculatedColumn(dateWithSalesColumnName, DateWithSalesCalculatedColumnExpression);
-
 string ShowValueForDatesMeasureExpression = "VAR LastDateWithData = " + "    CALCULATE ( " + "        MAX (  " + factDateColumnWithTable + " ), " + "        REMOVEFILTERS () " + "    )" + "VAR FirstDateVisible = " + "    MIN ( " + dateColumnWithTable + " ) " + "VAR Result = " + "    FirstDateVisible <= LastDateWithData " + "RETURN " + "    Result ";
-
-var ShowValueForDatesMeasure = dateTable.AddMeasure(ShowValueForDatesMeasureName, ShowValueForDatesMeasureExpression);
-
-ShowValueForDatesMeasure.FormatDax();
-
 string ShowADY = "VAR _LSD = " + "    MAX (  " + factDateColumnWithTable + " ) " + " VAR _LSDPY = " + "    EDATE( " + "        _LSD, " + "        - 12 " + "    )" + " RETURN " + "    " + dateColumnWithTable + "<= _LSDPY ";
 
-var ShowValueForDatesADY = dateTable.AddCalculatedColumn(ADYname, ShowADY);
+if (!Model.Tables[dateTableName].Columns.Contains(ADYname)) {
+	var ShowValueForDatesADY = dateTable.AddCalculatedColumn(ADYname, ShowADY);
 
-ShowValueForDatesMeasure.FormatDax();
+	ShowValueForDatesADY.FormatDax();
+};
+if (!Model.Tables[dateTableName].Columns.Contains(dateWithSalesColumnName)) {
+
+	var AddDateSales = dateTable.AddCalculatedColumn(dateWithSalesColumnName, DateWithSalesCalculatedColumnExpression);
+	AddDateSales.FormatDax();
+}
+if (!Model.Tables[dateTableName].Measures.Contains(ShowValueForDatesMeasureName)) {
+	var ShowValueForDatesMeasure = dateTable.AddMeasure(ShowValueForDatesMeasureName, ShowValueForDatesMeasureExpression);
+
+	ShowValueForDatesMeasure.FormatDax();
+};
 
 string YTDName = " YtD";
 string PYYTDName = " PY YtD";
@@ -197,7 +119,7 @@ string FinishPY = ")" + " VAR CurrentRange = " + "    DATESBETWEEN( " + dateColu
 string FinalPiech = PYLMEA + " , " + "            PreviousRange, " + "        " + dateTableName + "[ADY] = TRUE ))";
 
 foreach(var mdd in Selected.Measures) {
-	string df = "__" + mdd.Name;
+	string df = "__" + DisplayFolderName;
 	var MESN = mdd.Table.AddMeasure(
 	mdd.Name + YTDName, YTDExpressionFirstPart + mdd.DaxObjectName + YTDEXPRENextPart);
 	var PYTN = mdd.Table.AddMeasure(
@@ -210,4 +132,4 @@ foreach(var mdd in Selected.Measures) {
 	MESN.FormatDax();
 	PYTN.FormatDax();
 	YOYNNN.FormatDax();
-}
+};
