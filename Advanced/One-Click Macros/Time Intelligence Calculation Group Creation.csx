@@ -85,7 +85,7 @@ if(affectedMeasuresTableName == "") return;
 //string affectedMeasuresTableName = "Time Intelligence Affected Measures"; 
 
 
-string affectedMeasuresColumnName = Interaction.InputBox("Provide a name for affected measures table", "Affected Measures Table Column Name", "Measure", 740, 400);
+string affectedMeasuresColumnName = Interaction.InputBox("Provide a name for affected measures table column name", "Affected Measures Table Column Name", "Measure", 740, 400);
 if(affectedMeasuresColumnName == "") return;
 //string affectedMeasuresColumnName = "Measure"; 
 
