@@ -5,10 +5,12 @@
 var oldTableNameString = "";
 var newTableNameString = "";
 
-// Loop through all tables in the model and
-// replace oldTableNameString in each table name with newTableNameString
-
+// Loop through all tables in the model, replacing oldTableNameString with newTableNameString
 foreach(var t in Model.Tables)
 {
     t.Name = t.Name.Replace(oldTableNameString, newTableNameString);
+	foreach(var p in t.Partitions)
+	{
+		p.Name = p.Name.Replace(oldTableNameString, newTableNameString);
+	}
 }
