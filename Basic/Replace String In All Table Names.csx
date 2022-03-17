@@ -9,6 +9,7 @@ var newTableNameString = "";
 foreach(var t in Model.Tables)
 {
     t.Name = t.Name.Replace(oldTableNameString, newTableNameString);
+	// Loop through all partitions in the table, replacing oldTableNameString with newTableNameString
 	foreach(var p in t.Partitions)
 	{
 		p.Name = p.Name.Replace(oldTableNameString, newTableNameString);
