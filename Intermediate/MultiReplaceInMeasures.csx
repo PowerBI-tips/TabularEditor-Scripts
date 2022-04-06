@@ -3,8 +3,9 @@
  * 
  * Author: Dan Meissner
  * 
- * This script will loop through a matched pair of strings held in a 2-D array 
- * and search and replace a FromString and ToString pair in the currently selected measures.
+ * This script iterates through all currently-selected measures, using the matched pairs of strings
+ * in the 2-D array named "ReplacementPair" below as a template, replacing all instances of "FromStringX"
+ * in the current measure's DAX expression with the corresponding "ToStringX"
  *
  */
 
@@ -17,7 +18,7 @@
 	// (technically C# has a 2GB memory size and 4 Billion array item limit, but... really...)
 
     // If the string you are either searching for or replacing with contains a double quote " then you need to 'escape it' by 
-    // proceeding it with a backslash \ (as in \") to have that quote character wihtin the respective text string
+    //proceeding preceding it with a backslash \ (as in \") (as in \") to have that quote character wihtin within the respective text string
 
 	var ReplacementPair  = new string[,] { {"FromString1","ToString1"},
                                            {"FromString2","ToString2"},
