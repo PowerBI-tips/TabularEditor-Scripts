@@ -1,4 +1,4 @@
-// Title: create-parent-child-hierarchy
+// Title: Create Parent-Child Hierarchy.csx
 //  
 // Author: Sergio Murru, https://sergiomurru.com
 // 
@@ -36,6 +36,7 @@ SortedDictionary<string, string> measuresToWrap =
 };
 // configuration end
 
+
 string daxPath = string.Format( "PATH({0}[{1}], {0}[{2}])", 
     tableName, keyName, parentKeyName);
     
@@ -48,7 +49,6 @@ if (hierarchiesCollection.Count() > 0)
 {
     hierarchiesCollection.First().Delete();
 }
-
 
 foreach (var wrapperMeasurePair in measuresToWrap)
 {
@@ -99,6 +99,7 @@ if (pathCalculatedColumnCollection.Count() > 0)
     pathCalculatedColumnCollection.First().Delete();
 }
 
+
 // create calculated columns
 table.AddCalculatedColumn(pathName, daxPath);
 
@@ -135,6 +136,7 @@ for (int i = 1; i <= levels; ++i)
         tableName, pathName, nameName, keyName);
     table.Hierarchies[hierarchyName].AddLevel(levelName);
 }
+
 
 // Create measures
 string daxRowDepthMeasureFormat = "MAX( {0}[{1}])";
