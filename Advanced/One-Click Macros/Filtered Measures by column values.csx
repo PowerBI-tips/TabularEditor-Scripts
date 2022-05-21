@@ -1,15 +1,15 @@
 // '2022-05-21 / B.Agullo / 
 // FILTERED MEASURES BY COLUMN VALUES SCRIPT 
 // creates a measure for each of the values in a column filtering the selected base measure
-
+// step by step instructions at https://www.esbrina-ba.com/creating-filtered-measures-or-how-to-show-the-total-along-with-the-detail-in-a-chart/
 
 var measures = Selected.Measures;
 
-if(measures.Count == 0)
+if (measures.Count == 0)
 {
     ScriptHelper.Error("Select one or more measures");
 }
-            
+
 Table table = ScriptHelper.SelectTable();
 Column column = ScriptHelper.SelectColumn(table);
 
@@ -21,10 +21,13 @@ using (var reader = Model.Database.ExecuteReader(query))
     while (reader.Read())
     {
         string columnValue = reader.GetValue(0).ToString();
+        string formulaColumnValue = columnValue; 
+
+
 
         if (column.DataType.Equals(DataType.String))
         {
-            columnValue = "\"" + columnValue + "\""; 
+            formulaColumnValue = "\"" + columnValue + "\"";
         }
 
 
@@ -35,7 +38,7 @@ using (var reader = Model.Database.ExecuteReader(query))
                 string.Format("CALCULATE({0},{1}={2})",
                     measure.DaxObjectName,
                     column.DaxObjectFullName,
-                    columnValue
+                    formulaColumnValue
                 );
             string measureDescription =
                 string.Format("{0} filtered by {1} = {2}",
@@ -48,7 +51,7 @@ using (var reader = Model.Database.ExecuteReader(query))
                     measure.Name,
                     column.Name
                 );
-            Measure newMeasure = 
+            Measure newMeasure =
                 measure.Table.AddMeasure(
                     name: measureName,
                     expression: measureExpression,
@@ -56,6 +59,7 @@ using (var reader = Model.Database.ExecuteReader(query))
                 );
             newMeasure.Description = measureDescription;
             newMeasure.FormatDax();
+            newMeasure.FormatString = measure.FormatString;
 
 
         }
