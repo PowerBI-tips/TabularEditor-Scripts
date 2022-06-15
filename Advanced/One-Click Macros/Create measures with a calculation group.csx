@@ -89,6 +89,12 @@ if(regularCg == null)
 /*iterates through each selected measure*/
 foreach (Measure m in Selected.Measures)
 {
+    /*check that base measure has a proper format string*/ 
+    if(m.FormatString == "") {
+        Error("Define FormatString for " + m.Name + " and try again");
+        return;
+    };
+
     /*prepares a displayfolder to store all new measures*/
     string displayFolderName = m.Name + " Measures";
 
