@@ -13,14 +13,19 @@
 
 /*customize if needed*/
 string alertDisplayFolderPrefix = "Checks ";
-string allMeasuresPrefix = "Alerts ";
+string allMeasuresPrefix = "Alerts Value ";
 string allTitleMeasuresPrefix = "Alerts Descriptions ";
+string allMeasureCountPrefix = "Alert Count "; 
+
 string summaryMeasuresDisplayFolder = "Summary Measures";
 string titleMeasuresPrefix = "Title ";
 string titleMeasuresDisplayFolderPrefix = "Titles of ";
 
-string overallAlertValueMeasureName = "Total Alerts";
+
+
+string overallAlertValueMeasureName = "Total Alerts Value";
 string overallAlertDescMeasureName = "Total Alerts Description";
+string overallAlertCountMeasureName = "Total Alert Count"; 
 
 
 /*do not modify below this line*/
@@ -30,6 +35,7 @@ string overallAlertDescMeasureName = "Total Alerts Description";
 string annotationKey = "@AgulloBernat";
 string annotationValue = "Alert Summary Sum Measure";
 string annotationValueDesc = "Alert Description Concat Measure";
+string annotationValueCount = "Alert Count Measure";
 
 
 if(Selected.Tables.Count() != 1)
@@ -48,6 +54,8 @@ foreach (Table t in Model.Tables)
     string allMeasureName = "";
     string allTitleMeasureExpression = "\"\"";
     string allTitleMeasureName = "";
+    string allMeasureCountExpression = "";
+    string allMeasureCountName = ""; 
 
 
     /*check if there's any measure to process*/
@@ -99,13 +107,18 @@ foreach (Table t in Model.Tables)
                     + " & IF(" + m.DaxObjectFullName + "> 0,"
                     + titleM.DaxObjectFullName + " & UNICHAR(10))";
                     
-            CustomAction(m,"Dynamic Measure");
-
+            //m.CustomAction("Dynamic Measure");
+            
+            allMeasureCountExpression = 
+                allMeasureCountExpression 
+                + Environment.NewLine + " + IF(" + m.DaxObjectFullName + "> 0, 1)";
+                
         };
 
         /*now create the summary measures for that table*/
         allMeasureName = allMeasuresPrefix + t.Name;
         allTitleMeasureName = allTitleMeasuresPrefix + t.Name;
+        allMeasureCountName = allMeasureCountPrefix + t.Name;
 
         foreach (Measure delM in Model.AllMeasures.Where(x => x.Name == allMeasureName).ToList())
         {
@@ -113,6 +126,11 @@ foreach (Table t in Model.Tables)
         };
 
         foreach (Measure delM in Model.AllMeasures.Where(x => x.Name == allTitleMeasureName).ToList())
+        {
+            delM.Delete();
+        };
+        
+        foreach (Measure delM in Model.AllMeasures.Where(x => x.Name == allMeasureCountName).ToList())
         {
             delM.Delete();
         };
@@ -134,7 +152,20 @@ foreach (Table t in Model.Tables)
                 expression: allTitleMeasureExpression,
                 displayFolder: summaryMeasuresDisplayFolder);
 
-        measure.SetAnnotation(annotationKey, annotationValueDesc);
+        titleMeasure.SetAnnotation(annotationKey, annotationValueDesc);
+        titleMeasure.FormatDax(); 
+        titleMeasure.CustomAction("Dynamic Measure"); 
+        
+        Measure countMeasure =
+            t.AddMeasure(
+                name: allMeasureCountName,
+                expression: allMeasureCountExpression,
+                displayFolder: summaryMeasuresDisplayFolder);
+
+        countMeasure.SetAnnotation(annotationKey, annotationValueCount);
+        countMeasure.FormatDax(); 
+        countMeasure.CustomAction("Dynamic Measure"); 
+        
     }
 }
 
@@ -158,27 +189,36 @@ if (Model.AllMeasures.Any(
 
 }
 
+if (Model.AllMeasures.Any(
+    x => x.Name == overallAlertCountMeasureName))
+{
+    Model.AllMeasures.Where(
+        x => x.Name == overallAlertCountMeasureName
+        ).First().Delete();
+
+}
+
+
 /*regenerate if necessary*/
 if (Model.AllMeasures.Any(
     x => x.DisplayFolder.IndexOf(summaryMeasuresDisplayFolder) == 0
-           & x.Name.IndexOf(allMeasuresPrefix) == 0
-           & x.Name.IndexOf(allTitleMeasuresPrefix) != 0))
+           & x.Name.IndexOf(allMeasuresPrefix) == 0))
 {
 
-    string overallAlertValueMeasureExpression = "0";
+    string overallAlertValueMeasureExpression = "";
     string overallAlertDescMeasureExpression = "\"\"";
+    string overallAlertCountMeasureExpression = "";
 
     foreach (Measure m in
         Model.AllMeasures.Where(
             x => x.DisplayFolder.IndexOf(summaryMeasuresDisplayFolder) == 0
-                & x.Name.IndexOf(allMeasuresPrefix) == 0
-                & x.Name.IndexOf(allTitleMeasuresPrefix) != 0))
+                & x.Name.IndexOf(allMeasuresPrefix) == 0))
     {
 
 
         overallAlertValueMeasureExpression =
-                           overallAlertValueMeasureExpression
-                           + " + " + m.DaxObjectFullName;
+            overallAlertValueMeasureExpression
+                + " + " + m.DaxObjectFullName;
 
     }
 
@@ -189,7 +229,21 @@ if (Model.AllMeasures.Any(
     {
         overallAlertDescMeasureExpression =
             overallAlertDescMeasureExpression
-                + " & " + m.DaxObjectFullName;
+                + " & IF(LEN(" +m.DaxObjectFullName +")>0, UNICHAR(10) & UNICHAR(10) & \"********** " 
+                    + m.Table.Name + "*********\" & UNICHAR(10) & " +  m.DaxObjectFullName + ")";
+
+    }
+
+
+
+    foreach (Measure m in
+         Model.AllMeasures.Where(
+             x => x.DisplayFolder.IndexOf(summaryMeasuresDisplayFolder) == 0
+                 & x.Name.IndexOf(allMeasureCountPrefix) == 0))
+    {
+        overallAlertCountMeasureExpression =
+            overallAlertCountMeasureExpression
+                + " + " + m.DaxObjectFullName;
 
     }
 
@@ -200,5 +254,10 @@ if (Model.AllMeasures.Any(
 
     Measure alertDescMeasure = Selected.Table.AddMeasure(overallAlertDescMeasureName, overallAlertDescMeasureExpression);
     alertDescMeasure.FormatDax();
+
+    Measure alertCountMeasure =  Selected.Table.AddMeasure(overallAlertCountMeasureName, overallAlertCountMeasureExpression);
+    alertCountMeasure.FormatDax();
+    alertCountMeasure.FormatString ="#,##0";
+
 
 };
