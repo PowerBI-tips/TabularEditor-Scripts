@@ -44,6 +44,9 @@ if(Selected.Tables.Count() != 1)
     return;
 }
 
+//create calculation group without any calc items
+Model.CustomAction("Dynamic Measure"); 
+
 /* go through each table ... */
 foreach (Table t in Model.Tables)
 {
