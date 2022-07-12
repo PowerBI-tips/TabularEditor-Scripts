@@ -1,17 +1,27 @@
 /* 
 //2022-06-29 B.Agullo 
-//Selecting measures from a single display folder
-//will generate a new display folder in the same table
-//called "Titles " followed by the original display folder
+//
+// BLOG POST on the actual use case and how to use it
+// https://www.esbrina-ba.com/data-validation-with-power-bi/
+//
+//Selecting a table will select the table for the overall summary measures.
+//The script will go through all the tables of the model and 
+//for each table if will scan the measures contained in the display folder that starts with "Checks " 
+// and will generate a new display folder in the same table
+//called "Titles " followed by the original display folder name
 //where all measures original measures will have an equivalent measure
 //with the expression [original measure] & Original measure name
 //also another displayfolder called "summary measures" 
 //will contain 2 measures. One is the sum of all selected measures 
 //the other one is the concatenation of all the titles measures
 //Useful when setting alarms when one measure is greater than 0
+//on the original selected table it will store the sum of all the summary measures of the model
+//read the blog post for a more clear idea of how to use it.
 */
 
 /*customize if needed*/
+string dynamicMeasureCustomActionName = "Dynamic Measure"; 
+
 string alertDisplayFolderPrefix = "Checks ";
 string allMeasuresPrefix = "Alerts Value ";
 string allTitleMeasuresPrefix = "Alerts Descriptions ";
@@ -45,7 +55,7 @@ if(Selected.Tables.Count() != 1)
 }
 
 //create calculation group without any calc items
-Model.CustomAction("Dynamic Measure"); 
+Model.CustomAction(dynamicMeasureCustomActionName); 
 
 /* go through each table ... */
 foreach (Table t in Model.Tables)
@@ -147,7 +157,7 @@ foreach (Table t in Model.Tables)
         measure.SetAnnotation(annotationKey, annotationValue);
         measure.FormatString = "#,##0";
         measure.FormatDax();
-        measure.CustomAction("Dynamic Measure");
+        measure.CustomAction(dynamicMeasureCustomActionName);
         
         Measure titleMeasure =
             t.AddMeasure(
@@ -157,7 +167,7 @@ foreach (Table t in Model.Tables)
 
         titleMeasure.SetAnnotation(annotationKey, annotationValueDesc);
         titleMeasure.FormatDax(); 
-        titleMeasure.CustomAction("Dynamic Measure"); 
+        titleMeasure.CustomAction(dynamicMeasureCustomActionName); 
         
         Measure countMeasure =
             t.AddMeasure(
@@ -167,7 +177,7 @@ foreach (Table t in Model.Tables)
 
         countMeasure.SetAnnotation(annotationKey, annotationValueCount);
         countMeasure.FormatDax(); 
-        countMeasure.CustomAction("Dynamic Measure"); 
+        countMeasure.CustomAction(dynamicMeasureCustomActionName); 
         
     }
 }
