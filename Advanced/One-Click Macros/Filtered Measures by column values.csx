@@ -7,11 +7,11 @@ var measures = Selected.Measures;
 
 if (measures.Count == 0)
 {
-    ScriptHelper.Error("Select one or more measures");
+    ScriptHost.Error("Select one or more measures");
 }
 
-Table table = ScriptHelper.SelectTable();
-Column column = ScriptHelper.SelectColumn(table);
+Table table = ScriptHost.SelectTable();
+Column column = ScriptHost.SelectColumn(table);
 
 string query = "EVALUATE DISTINCT(" + column.DaxObjectFullName + ")";
 
