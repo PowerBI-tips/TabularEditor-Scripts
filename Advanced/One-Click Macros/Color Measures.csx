@@ -8,12 +8,15 @@
 
 //This script creates the color measures for each of the colors included in the theme color table. 
 // See http://www.esbrina-ba.com/theme-compliant-conditional-formatting-measures/
+// Also https://www.esbrina-ba.com/building-a-fading-bar-chart/ 
 
 //adjust to fit your particular model
 
 
-string colorNameTag = "Name" //string likely to indicate a color name column
-string colorCodeTag = "Hex" //string likely to indicate a color code column
+string colorNameTag = "Name"; //string likely to indicate a color name column
+string colorCodeTag = "Hex"; //string likely to indicate a color code column
+
+// -------- do not modify beyond this line (if you don't know what you are doing)
 
 if(Selected.Tables.Count() != 1) { 
     Error("Select only table containing color definitions and try again"); 
@@ -47,7 +50,7 @@ string colorColumnCodeCandidate =
 string hexCodeColumnName = 
     SelectColumn(
         Selected.Table,
-        Selected.Table.Columns[colorColumnNameCandidate],
+        Selected.Table.Columns[colorColumnCodeCandidate],
         "Select color code Column"
     ).Name; 
 
@@ -69,6 +72,11 @@ using (var reader = Model.Database.ExecuteReader(query))
         string myColor = reader.GetValue(0).ToString();
         string measureName = myColor;
         string myExpression = "VAR HexCode = CALCULATE( SELECTEDVALUE( " + hexCodeColumnNameWithTable + "), " + colorColumnNameWithTable + " = \""  + myColor + "\") VAR Result = FORMAT(hexCode,\"@\") RETURN Result ";
+        
+        if(Model.AllMeasures.Any(x => x.Name == measureName)) {
+            foreach (Measure m in Model.AllMeasures.Where(x => x.Name == measureName).ToList()) { m.Delete(); }; 
+        };
+
         var newColorMeasure = Model.Tables[colorTableName].AddMeasure(measureName, myExpression);
        newColorMeasure.FormatDax(); 
         
@@ -76,6 +84,11 @@ using (var reader = Model.Database.ExecuteReader(query))
 }
  
 if(createTransparentColor){
+    
+    if(Model.AllMeasures.Any(x => x.Name == "Transparent")) {
+            foreach (Measure m in Model.AllMeasures.Where(x => x.Name == "Transparent").ToList()) { m.Delete(); }; 
+    };
+
     var transparentMeasure = Model.Tables[colorTableName].AddMeasure("Transparent","\"#FFFFFF00\""); 
 };
 
