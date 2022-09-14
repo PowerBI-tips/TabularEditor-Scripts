@@ -1,6 +1,10 @@
 #r "Microsoft.VisualBasic"
 using System.Windows.Forms; 
-using Microsoft.VisualBasic;
+using Microsoft.VisualBasic
+
+//2022-09-14 / B.Agullo / first release
+//CREATE CALCULATION GROUP TO ENABLE INACTIVE RELEATIONSHIPS
+//Select releationships of your model and run the script
 
 //initialize calc group variable
 CalculationGroupTable cg = null as CalculationGroupTable;
