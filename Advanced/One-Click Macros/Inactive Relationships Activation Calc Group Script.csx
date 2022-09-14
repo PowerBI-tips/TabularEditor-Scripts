@@ -6,6 +6,8 @@ using Microsoft.VisualBasic
 //CREATE CALCULATION GROUP TO ENABLE INACTIVE RELEATIONSHIPS
 //Select releationships of your model and run the script
 
+//see https://www.esbrina-ba.com/activating-inactive-relationships-the-smart-way/ 
+
 //initialize calc group variable
 CalculationGroupTable cg = null as CalculationGroupTable;
 
