@@ -4,8 +4,13 @@ using System.Windows.Forms;
 
 /* '2022-06-13 / B.Agullo / */
 /* '2022-09-17 / B.Agullo / possibility to create a Field Parameter with a column for the base measure & calc Item
+
 /* CREATE MEASURES WITH BASE MEASURES AND A CALCULATION GROUP */ 
-/* https://www.esbrina-ba.com/creating-well-formatted-measures-based-on-a-calculation-group/  */
+
+/* See: https://www.esbrina-ba.com/creating-well-formatted-measures-based-on-a-calculation-group/  */
+/* See: https://www.esbrina-ba.com/a-dynamic-legend-for-a-dynamic-measure-time-intel-chart/
+
+
 /* select measures and execute, you will need to run it twice */ 
 /* first time to create aux calc group, second time to actually create measuree*/ 
 /* remove aux calc group before going to production, do the right thing */ 
