@@ -1,3 +1,4 @@
+// '2022-09-24 / B.Agullo / Removed ScriptHost to make it TE2 compatible
 // '2022-05-21 / B.Agullo / 
 // FILTERED MEASURES BY COLUMN VALUES SCRIPT 
 // creates a measure for each of the values in a column filtering the selected base measure
@@ -7,11 +8,11 @@ var measures = Selected.Measures;
 
 if (measures.Count == 0)
 {
-    ScriptHost.Error("Select one or more measures");
+    Error("Select one or more measures");
 }
 
-Table table = ScriptHost.SelectTable();
-Column column = ScriptHost.SelectColumn(table);
+Table table = SelectTable();
+Column column = SelectColumn(table);
 
 string query = "EVALUATE DISTINCT(" + column.DaxObjectFullName + ")";
 
