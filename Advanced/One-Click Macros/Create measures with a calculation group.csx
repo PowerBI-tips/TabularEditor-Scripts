@@ -134,59 +134,66 @@ foreach (Measure m in Selected.Measures)
     /*iterates thorough all calculation items of the selected calc group*/ 
     foreach (CalculationItem calcItem in regularCg.CalculationItems)
     {
+        /*measure name*/ 
+        string measureName = m.Name + " " + calcItem.Name;           
         
-        /*prepares a query to calculate the resulting format when applying the calculation item on the measure*/ 
-        string query = string.Format(
-            "EVALUATE {{CALCULATE({0},{1},{2})}}",
-            m.DaxObjectFullName,
-            string.Format(
-                "{0}=\"{1}\"",
-                regularCg.Columns[0].DaxObjectFullName,
-                calcItem.Name),
-            string.Format(
-                "{0}=\"{1}\"",
-                auxCg.Columns[0].DaxObjectFullName,
-                auxCalcItemName)
-            );
+        //only if the measure is not yet there (think of reruns)
+        if(!Model.AllMeasures.Any(x => x.Name == measureName)){
 
-        /*executes the query*/ 
-        using (var reader = Model.Database.ExecuteReader(query))
-        {
-            // resultset should contain just one row, with the format string
-            while (reader.Read())
-            {
-                /*retrive the formatstring from the query*/ 
-                string formatString = reader.GetValue(0).ToString();
-
-                /*build the expression of the measure*/
-                string measureExpression = string.Format(
-                    "CALCULATE({0},{1}=\"{2}\")",
-                    m.DaxObjectName,
+            /*prepares a query to calculate the resulting format when applying the calculation item on the measure*/ 
+            string query = string.Format(
+                "EVALUATE {{CALCULATE({0},{1},{2})}}",
+                m.DaxObjectFullName,
+                string.Format(
+                    "{0}=\"{1}\"",
                     regularCg.Columns[0].DaxObjectFullName,
-                    calcItem.Name);
+                    calcItem.Name),
+                string.Format(
+                    "{0}=\"{1}\"",
+                    auxCg.Columns[0].DaxObjectFullName,
+                    auxCalcItemName)
+                );
 
-                /*measure name*/ 
-                string measureName = m.Name + " " + calcItem.Name;
-                
-                /*actually build the measure*/ 
-                Measure newMeasure = 
-                    m.Table.AddMeasure(
-                        name: measureName,
-                        expression: measureExpression);
+            /*executes the query*/ 
+            using (var reader = Model.Database.ExecuteReader(query))
+            {
+                // resultset should contain just one row, with the format string
+                while (reader.Read())
+                {
+                                 
+
+                    /*retrive the formatstring from the query*/ 
+                    string formatString = reader.GetValue(0).ToString();
+
+                    /*build the expression of the measure*/
+                    string measureExpression = string.Format(
+                        "CALCULATE({0},{1}=\"{2}\")",
+                        m.DaxObjectName,
+                        regularCg.Columns[0].DaxObjectFullName,
+                        calcItem.Name);
+
+                    
+                    
+                    /*actually build the measure*/ 
+                    Measure newMeasure = 
+                        m.Table.AddMeasure(
+                            name: measureName,
+                            expression: measureExpression);
 
 
-                /*the all important format string!*/
-                newMeasure.FormatString = formatString;
+                    /*the all important format string!*/
+                    newMeasure.FormatString = formatString;
 
-                /*final polish*/
-                newMeasure.DisplayFolder = displayFolderName;
-                newMeasure.FormatDax();
-                
-                /*add annotations for the creation of the field parameter*/
-                newMeasure.SetAnnotation(baseMeasureAnnotationName,m.Name); 
-                newMeasure.SetAnnotation(calcItemAnnotationName,calcItem.Name);
-                newMeasure.SetAnnotation(scriptAnnotationName,scriptAnnotationValue);
+                    /*final polish*/
+                    newMeasure.DisplayFolder = displayFolderName;
+                    newMeasure.FormatDax();
+                    
+                    /*add annotations for the creation of the field parameter*/
+                    newMeasure.SetAnnotation(baseMeasureAnnotationName,m.Name); 
+                    newMeasure.SetAnnotation(calcItemAnnotationName,calcItem.Name);
+                    newMeasure.SetAnnotation(scriptAnnotationName,scriptAnnotationValue);
 
+                }
             }
         }
     } 
