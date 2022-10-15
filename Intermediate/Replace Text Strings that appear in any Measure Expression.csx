@@ -7,7 +7,7 @@
  * and replace the FromString with the ToString.
  */
 
-/ Replace Text Strings that appear in many measures
+// Replace Text Strings that appear in many measures
 
     // String of text that is desired to be found
     // Update the value of the text for your desired usecase

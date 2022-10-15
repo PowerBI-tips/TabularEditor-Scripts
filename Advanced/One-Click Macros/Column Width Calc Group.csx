@@ -11,7 +11,7 @@ using Microsoft.VisualBasic;
 
 
 string calcGroupName = Interaction.InputBox("Provide a name for your Calc Group", "Calc Group Name", "Column Width", 740, 400);
-string minWidth = Interaction.InputBox("Entere minimum column width", "Min Column Width", "5", 740, 400);
+string minWidth = Interaction.InputBox("Enter minimum column width", "Min Column Width", "5", 740, 400);
 
 int minWidthInt; 
 
@@ -25,7 +25,7 @@ if (!isMinWidthANumber) {
     return; 
 }; 
 
-string maxWidth = Interaction.InputBox("Entere minimum column width", "Min Column Width", "7", 740, 400);
+string maxWidth = Interaction.InputBox("Enter minimum column width", "Min Column Width", "7", 740, 400);
 
 int maxWidthInt; 
 
@@ -78,7 +78,7 @@ calculationItemAuto.FormatStringExpression = @"//// instructions to enable auto-
 // 1. delete line SELECTEDMEASUREFORMATSTRING() that is not commented 
 // 2. uncomment the rest of the code 
 // 3. replace the expression for maxValue for an expression that will return the max value of your matrix
-// You can duplicate the calc item to use in diferent matrices of your report
+// You can duplicate the calc item to use in different matrices of your report
 
 SELECTEDMEASUREFORMATSTRING()
 
