@@ -62,7 +62,7 @@ else if (dynamicCGs.Count() < 1)
     //if table already exists, make sure it is a Calculation Group type
     if (calcGroup.SourceType.ToString() != "CalculationGroup")
     {
-        ScriptHost.Error("Table exists in Model but is not a Calculation Group. Rename the existing table or choose an alternative name for your Calculation Group.");
+        Error("Table exists in Model but is not a Calculation Group. Rename the existing table or choose an alternative name for your Calculation Group.");
         return;
     };
 
@@ -81,7 +81,7 @@ else if (dynamicCGs.Count() < 1)
 else
 {
     //make them choose the calc group -- should not happen! 
-    cgTable = ScriptHost.SelectTable(dynamicCGs, label: "Select your Dynamic Measure Calculation Group For Arbitrary 2-row Header") as CalculationGroupTable;
+    cgTable = SelectTable(dynamicCGs, label: "Select your Dynamic Measure Calculation Group For Arbitrary 2-row Header") as CalculationGroupTable;
 }
 
 //get the column name in case the calc group was already there
@@ -105,7 +105,7 @@ else if (dummyMeasures.Count() < 1)
 else
 {
     //choose measure (should not happen!)
-    measureName = ScriptHost.SelectMeasure(dummyMeasures).Name;
+    measureName = SelectMeasure(dummyMeasures).Name;
 };
 
 secondaryMeasureName = measureName + " 2";

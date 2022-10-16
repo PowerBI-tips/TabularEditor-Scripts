@@ -54,15 +54,15 @@ if(buttonColorMeasureNameWhenVisible == "") return;
 
 string buttonColorMeasureValueWhenVisible = Interaction.InputBox("What's the color code of " + buttonColorMeasureNameWhenVisible + "?", "Visible color code", "#D64554", 740, 400);
 if(buttonColorMeasureValueWhenVisible == "") return;
-buttonColorMeasureValueWhenVisible = "\"" + buttonColorMeasureValueWhenVisible + "\""
+buttonColorMeasureValueWhenVisible = "\"" + buttonColorMeasureValueWhenVisible + "\"";
 
 string buttonColorMeasureNameWhenInvisible = Interaction.InputBox("What's the color measure name when button is invisible?", "Invisible color measure name", "Report Background Color", 740, 400);
 if(buttonColorMeasureNameWhenInvisible == "") return;
-buttonColorMeasureNameWhenInvisible = "\"" + buttonColorMeasureNameWhenInvisible + "\""
+buttonColorMeasureNameWhenInvisible = "\"" + buttonColorMeasureNameWhenInvisible + "\"";
 
 string buttonColorMeasureValueWhenInvisible = Interaction.InputBox("What's the color code of " + buttonColorMeasureNameWhenInvisible + "?", "Invisible color measure name", "Report Background Color", 740, 400);
 if(buttonColorMeasureValueWhenInvisible == "") return;
-buttonColorMeasureValueWhenInvisible = "\"" + buttonColorMeasureValueWhenInvisible + "\""
+buttonColorMeasureValueWhenInvisible = "\"" + buttonColorMeasureValueWhenInvisible + "\"";
 
 
 // prepare array to iterate on new measure names 
@@ -168,5 +168,5 @@ var buttonTextMeasure =
 buttonTextMeasure.FormatDax(); 
 buttonTextMeasure.Description = "Use this measure for dynamic button text";  
 
-dataProblemsMeasure.MoveTo(navigationTable);
+//dataProblemsMeasure.MoveTo(navigationTable);
     
