@@ -58,9 +58,8 @@ buttonColorMeasureValueWhenVisible = "\"" + buttonColorMeasureValueWhenVisible +
 
 string buttonColorMeasureNameWhenInvisible = Interaction.InputBox("What's the color measure name when button is invisible?", "Invisible color measure name", "Report Background Color", 740, 400);
 if(buttonColorMeasureNameWhenInvisible == "") return;
-buttonColorMeasureNameWhenInvisible = "\"" + buttonColorMeasureNameWhenInvisible + "\"";
 
-string buttonColorMeasureValueWhenInvisible = Interaction.InputBox("What's the color code of " + buttonColorMeasureNameWhenInvisible + "?", "Invisible color measure name", "Report Background Color", 740, 400);
+string buttonColorMeasureValueWhenInvisible = Interaction.InputBox("What's the color code of " + buttonColorMeasureNameWhenInvisible + "?", "Invisible color measure name", "#FFFFFF", 740, 400);
 if(buttonColorMeasureValueWhenInvisible == "") return;
 buttonColorMeasureValueWhenInvisible = "\"" + buttonColorMeasureValueWhenInvisible + "\"";
 
