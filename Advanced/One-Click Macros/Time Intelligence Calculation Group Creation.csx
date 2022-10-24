@@ -105,9 +105,6 @@ if(Model.Tables.Any(t => t.GetAnnotation("@AgulloBernat") == "Time Intel Affecte
 if(affectedMeasuresTableName == "") return;
 
 
-string affectedMeasuresColumnName;
-
-
 if(Model.Tables.Any(t => t.GetAnnotation("@AgulloBernat") == "Time Intel Affected Measures Table")) {
     affectedMeasuresColumnName = Model.Tables.Where(t => t.GetAnnotation("@AgulloBernat") == "Time Intel Affected Measures Table").First().Columns.First().Name;
 
@@ -116,6 +113,9 @@ if(Model.Tables.Any(t => t.GetAnnotation("@AgulloBernat") == "Time Intel Affecte
 
 };
 
+
+
+string affectedMeasuresColumnName = Interaction.InputBox("Provide a name for affected measures table column name", "Affected Measures Table Column Name", "Measure", 740, 400);
 
 if(affectedMeasuresColumnName == "") return;
 //string affectedMeasuresColumnName = "Measure"; 

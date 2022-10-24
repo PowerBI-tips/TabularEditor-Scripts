@@ -42,3 +42,8 @@ foreach(var c in Selected.Columns)
     c.IsHidden = true;
 }
 ```
+## Tips and tricks
+
+ - When trying to add quotation marks for string value (aka quotation within quatation) the "\" should be added. It is added for opening and ending quatation
+ - Experiment, but make a copy of the file. If anything goes worn CTRL+Z and you will undo the script
+ - 

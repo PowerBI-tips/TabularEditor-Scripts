@@ -8,8 +8,8 @@ using Microsoft.VisualBasic;
 // www.esbrina-ba.com
 
 // Instructions: 
-//select the measures that counts the number of "data problems" the model has and then run the script or as macro
-//when adding macro select measure context for execution 
+// select the measures that counts the number of "data problems" the model has and then run the script or as macro
+// when adding macro select measure context for execution 
 
 //
 // ----- do not modify script below this line -----
@@ -20,7 +20,6 @@ if (Selected.Measures.Count != 1) {
     Error("Select one and only one measure");
     return;
 };
-
 
 string navigationTableName = Interaction.InputBox("Provide a name for navigation measures table name", "Navigation Table Name", "Navigation", 740, 400);
 if(navigationTableName == "") return;
@@ -49,14 +48,13 @@ string dataProblemsSheetName = Interaction.InputBox("Where are the data problems
 if(dataProblemsSheetName == "") return;
 
 
-//colors will be created if not present
+// colors will be created if not present
 string buttonColorMeasureNameWhenVisible = Interaction.InputBox("What's the color measure name when the button is visible?", "Visible color measure name", "Warning Color", 740, 400);
 if(buttonColorMeasureNameWhenVisible == "") return;
 
 string buttonColorMeasureValueWhenVisible = Interaction.InputBox("What's the color code of " + buttonColorMeasureNameWhenVisible + "?", "Visible color code", "#D64554", 740, 400);
 if(buttonColorMeasureValueWhenVisible == "") return;
 buttonColorMeasureValueWhenVisible = "\"" + buttonColorMeasureValueWhenVisible + "\""
-
 
 string buttonColorMeasureNameWhenInvisible = Interaction.InputBox("What's the color measure name when button is invisible?", "Invisible color measure name", "Report Background Color", 740, 400);
 if(buttonColorMeasureNameWhenInvisible == "") return;
@@ -67,8 +65,7 @@ if(buttonColorMeasureValueWhenInvisible == "") return;
 buttonColorMeasureValueWhenInvisible = "\"" + buttonColorMeasureValueWhenInvisible + "\""
 
 
-
-//prepare array to iterate on new measure names 
+// prepare array to iterate on new measure names 
 string[] newMeasureNames = 
     {
         buttonTextMeasureName,
@@ -77,7 +74,8 @@ string[] newMeasureNames =
         thereAreDataProblemsMeasureName
     };
 
-//check none of the new measure names already exist as such 
+
+// check none of the new measure names already exist as such 
 foreach(string measureName in newMeasureNames) {
     if(Model.AllMeasures.Any(Measure => Measure.Name == measureName)) {
         Error(measureName + " already exists!"); 
@@ -107,10 +105,8 @@ if(!Model.AllMeasures.Any(Measure => Measure.Name == buttonColorMeasureNameWhenI
     navigationTable.AddMeasure(buttonColorMeasureNameWhenInvisible,"\"#FFFFFF00\"");
 };
 
-
 string thereAreDataProblemsMeasureExpression = 
     "[" + dataProblemsMeasure.Name + "]>0";
-
 
 var thereAreDataProblemsMeasure = 
     navigationTable.AddMeasure(
@@ -147,7 +143,6 @@ string buttonNavigationMeasureExpression =
     "    \"\"" + 
     ")";
 
-
 var buttonNavigationMeasure = 
     navigationTable.AddMeasure(
         buttonNavigationMeasureName,
@@ -157,14 +152,12 @@ var buttonNavigationMeasure =
 buttonNavigationMeasure.FormatDax(); 
 buttonNavigationMeasure.Description = "Use this measure for conditional page navigation";  
 
-
 string buttonTextMeasureExpression = 
     "IF(" + 
     "    [" + thereAreDataProblemsMeasureName + "]," + 
     "    SUBSTITUTE(\"" + buttonTextPattern + "\",\"#\",FORMAT([" + dataProblemsMeasure.Name + "],0))," + 
     "    \"\"" + 
-    ")";
-    
+    ")";    
     
 var buttonTextMeasure = 
     navigationTable.AddMeasure(
