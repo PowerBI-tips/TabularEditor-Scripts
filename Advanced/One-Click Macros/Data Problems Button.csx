@@ -4,6 +4,7 @@ using Microsoft.VisualBasic;
 
 // '2021-05-26 / B.Agullo / 
 // '2021-10-13 / B.Agullo / dynamic parameters for one-click operation
+// '2022-10-18 / B.Agullo / Bug fixes
 // by Bernat Agulló
 // www.esbrina-ba.com
 
