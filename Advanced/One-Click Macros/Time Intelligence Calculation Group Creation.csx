@@ -134,11 +134,15 @@ if(factTableDateColumn == null) return;
 Table dateTableCandidate = null;
 
 if(Model.Tables.Any
-            (x => x.GetAnnotation("@AgulloBernat") == "Time Intel Date Table" || x.Name == "Date" || x.Name == "Calendar")){
-    dateTableCandidate = Model.Tables.Where
-            (x => x.GetAnnotation("@AgulloBernat") == "Time Intel Date Table" || x.Name == "Date" || x.Name == "Calendar").First();
+    (x => x.GetAnnotation("@AgulloBernat") == "Time Intel Date Table" 
+        || x.Name == "Date" 
+        || x.Name == "Calendar")){
+            dateTableCandidate = Model.Tables.Where
+                (x => x.GetAnnotation("@AgulloBernat") == "Time Intel Date Table" 
+                    || x.Name == "Date" 
+                    || x.Name == "Calendar").First();
 
-}
+};
 
 var dateTable = 
     SelectTable(
@@ -161,13 +165,11 @@ if(dateTable.Columns.Any
         (x => x.GetAnnotation("@AgulloBernat") == "Time Intel Date Table Date Column" || x.Name == "Date").First();
 };
 
-
 var dateTableDateColumn = 
     SelectColumn(
         dateTable.Columns, 
         label: "Select the date column",
-        preselect: dateTable.Columns.Where
-            (x => x.GetAnnotation("@AgulloBernat") == "Time Intel Date Table Date Column" || x.Name == "Date").First());
+        preselect: dateTableDateColumnCandidate);
 
 if(dateTableDateColumn == null) {
     Error("You just aborted the script"); 
