@@ -4,13 +4,10 @@ using System.Windows.Forms;
 
 /* '2022-06-13 / B.Agullo / */
 /* '2022-09-17 / B.Agullo / possibility to create a Field Parameter with a column for the base measure & calc Item
-
 /* CREATE MEASURES WITH BASE MEASURES AND A CALCULATION GROUP */ 
 
 /* See: https://www.esbrina-ba.com/creating-well-formatted-measures-based-on-a-calculation-group/  */
 /* See: https://www.esbrina-ba.com/a-dynamic-legend-for-a-dynamic-measure-time-intel-chart/
-
-
 /* select measures and execute, you will need to run it twice */ 
 /* first time to create aux calc group, second time to actually create measuree*/ 
 /* remove aux calc group before going to production, do the right thing */ 
@@ -23,6 +20,9 @@ string auxCalcItemName = "Get Format String";
 
 string baseMeasureAnnotationName = "Base Measure"; 
 string calcItemAnnotationName = "Calc Item"; 
+string calcItemSortOrderName = "Sort Order";
+string calcItemSortOrderValue = String.Empty;  
+
 string scriptAnnotationName = "Script";
 string scriptAnnotationValue = "Create Measures with a Calculation Group"; 
 
@@ -110,7 +110,7 @@ if(regularCg == null)
     return;
 };
 
-string name; 
+string name = String.Empty; 
 if(generateFieldParameter) {
     name = Interaction.InputBox("Provide a name for the field parameter", "Field Parameter", regularCg.Name + " Measures", 740, 400);
     if(name == "") {Error("Execution Aborted"); return;};
@@ -192,6 +192,7 @@ foreach (Measure m in Selected.Measures)
                     newMeasure.SetAnnotation(baseMeasureAnnotationName,m.Name); 
                     newMeasure.SetAnnotation(calcItemAnnotationName,calcItem.Name);
                     newMeasure.SetAnnotation(scriptAnnotationName,scriptAnnotationValue);
+                    newMeasure.SetAnnotation(calcItemSortOrderName,calcItem.Ordinal.ToString("000"));
 
                 }
             }
@@ -216,7 +217,10 @@ if(!generateFieldParameter) {
 if(Selected.Columns.Count == 0 && Selected.Measures.Count == 0) throw new Exception("No columns or measures selected!");
 
 // Construct the DAX for the calculated table based on the measures created previously by the script
-var objects = Model.AllMeasures.Where(x => x.GetAnnotation(scriptAnnotationName) == scriptAnnotationValue); 
+var objects = Model.AllMeasures
+    .Where(x => x.GetAnnotation(scriptAnnotationName) == scriptAnnotationValue)
+    .OrderBy(x => x.GetAnnotation(baseMeasureAnnotationName) + x.GetAnnotation(calcItemSortOrderName)); 
+
 var dax = "{\n    " + string.Join(",\n    ", objects.Select((c,i) => string.Format("(\"{0}\", NAMEOF('{1}'[{0}]), {2},\"{3}\",\"{4}\")", 
     c.Name, c.Table.Name, i,
     Model.Tables[c.Table.Name].Measures[c.Name].GetAnnotation("Base Measure"),
