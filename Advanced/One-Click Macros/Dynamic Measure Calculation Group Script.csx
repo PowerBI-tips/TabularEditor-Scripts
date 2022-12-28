@@ -5,6 +5,7 @@ using Microsoft.VisualBasic;
 // www.greyskullanalytics.com
 // '2021-10-15 / B.Agullo / dynamic parameters by B.Agullo / 
 // '2022-05-14 / B.Agullo / you can now rerun the script to simply add new measures or update existing ones
+// '2022-07-11 / B.Agullo / no check on the number of measures selected so it can be launched just to create the calc group table
 
 // Instructions:
 //select the measures you want to add to your Dynamic Measure and then run this script (or store it as macro)
@@ -12,15 +13,6 @@ using Microsoft.VisualBasic;
 //
 // ----- do not modify script below this line -----
 //
-
-
-
-
-if (Selected.Measures.Count == 0)
-{
-    ScriptHelper.Error("Select one or more measures");
-    return;
-}
 
 string dynamicMeasureCgTag = "@GreyskullPBI";
 string dynamicMeasureCgValue = "Dynamic Measure Calculation Group";
@@ -70,7 +62,7 @@ else if (dynamicCGs.Count() < 1)
     //if table already exists, make sure it is a Calculation Group type
     if (calcGroup.SourceType.ToString() != "CalculationGroup")
     {
-        ScriptHelper.Error("Table exists in Model but is not a Calculation Group. Rename the existing table or choose an alternative name for your Calculation Group.");
+        Error("Table exists in Model but is not a Calculation Group. Rename the existing table or choose an alternative name for your Calculation Group.");
         return;
     };
 
@@ -89,7 +81,7 @@ else if (dynamicCGs.Count() < 1)
 else
 {
     //make them choose the calc group -- should not happen! 
-    cgTable = ScriptHelper.SelectTable(dynamicCGs, label: "Select your Dynamic Measure Calculation Group For Arbitrary 2-row Header") as CalculationGroupTable;
+    cgTable = SelectTable(dynamicCGs, label: "Select your Dynamic Measure Calculation Group For Arbitrary 2-row Header") as CalculationGroupTable;
 }
 
 //get the column name in case the calc group was already there
@@ -113,34 +105,16 @@ else if (dummyMeasures.Count() < 1)
 else
 {
     //choose measure (should not happen!)
-    measureName = ScriptHelper.SelectMeasure(dummyMeasures).Name;
+    measureName = SelectMeasure(dummyMeasures).Name;
 };
 
 secondaryMeasureName = measureName + " 2";
 conditionalFormatMeasureName = measureName + " CF";
 
-//string switchSuffix = Interaction.InputBox("suffix for the SWITCH dynamic measure", "Suffix for switch", "SWITCH", 740, 400);
-//if (switchSuffix == "") return;
-
-//string formattedSuffix = Interaction.InputBox("suffix for the FORMATTED dynamic measure", "Suffix for formatted", "FORMATTED", 740, 400);
-//if (formattedSuffix == "") return;
-
-//string measureDefault = Interaction.InputBox("Measure default value", "Default Value", "BLANK()", 740, 400);
-//if (measureDefault == "") return;
-
-
 //check to see if dynamic measure has been created, if not create it now
 //if a measure with that name alredy exists elsewhere in the model, throw an error
 if (!cgTable.Measures.Contains(measureName))
 {
-    //foreach (var m in Model.AllMeasures)
-    //{
-    //    if (m.Name == measureName)
-    //    {
-    //        ScriptHelper.Error("This measure name already exists in table " + m.Table.Name + ". Either rename the existing measure or choose a different name for the measure in your Calculation Group.");
-    //        return;
-    //    };
-    //};
     dummyMeasure = cgTable.AddMeasure(measureName, "BLANK()");
     dummyMeasure.Description = "Control the content of this measure by selecting values from " + columnName + ".";
     dummyMeasure.SetAnnotation(dummyMeasureTag, dummyMeasureValue);
@@ -148,22 +122,12 @@ if (!cgTable.Measures.Contains(measureName))
 
 if (!cgTable.Measures.Contains(secondaryMeasureName))
 {
-    //foreach (var m in Model.AllMeasures)
-    //{
-    //    if (m.Name == measureName)
-    //    {
-    //        ScriptHelper.Error("This measure name already exists in table " + m.Table.Name + ". Either rename the existing measure or choose a different name for the measure in your Calculation Group.");
-    //        return;
-    //    };
-    //};
     dummyMeasure = cgTable.AddMeasure(secondaryMeasureName, "BLANK()");
     dummyMeasure.Description = "Control the content of this measure by selecting values from " + columnName + ". Secondary dynamic measure for complex use cases";
-
 };
 
 if (!cgTable.Measures.Contains(conditionalFormatMeasureName))
 {
-
     dummyMeasure = cgTable.AddMeasure(conditionalFormatMeasureName, "BLANK()");
     dummyMeasure.Description = "Control the content of this measure by selecting values from " + columnName + ". Used this measure for conditional format purposes";
 };
@@ -172,11 +136,12 @@ if (!cgTable.Measures.Contains(conditionalFormatMeasureName))
 
 string isSelectedMeasureString = "[" + measureName + "],[" + secondaryMeasureName + "],[" + conditionalFormatMeasureName + "]";
 
-////create calculation items based on selected measures, including check to make sure calculation item doesnt exist
-//foreach (var cg in Model.CalculationGroups)
-//{
-//    if (cg.Name == calcGroupName)
-//    {
+//if no measures were selected that's the end of the story
+//(only makes sense if being launched from another script and soon after will be launched against one or more measures)
+if (Selected.Measures.Count == 0) 
+{
+    return;
+}
 foreach (var m in Selected.Measures)
 {
     
