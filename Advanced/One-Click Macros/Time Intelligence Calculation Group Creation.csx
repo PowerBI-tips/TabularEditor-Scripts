@@ -8,6 +8,7 @@ using Microsoft.VisualBasic;
 // '2021-07-10 / B.Agullo / added flag expression to avoid breaking already special format strings
 // '2021-09-23 / B.Agullo / added code to prompt for parameters (code credit to Daniel Otykier) 
 // '2021-09-27 / B.Agullo / added code for general name 
+// '2022-10-11 / B.Agullo / added MMT and MWT calc item groups
 //
 // by Bernat Agulló
 // twitter: @AgulloBernat
@@ -69,23 +70,53 @@ if(affectedMeasures == "{") {
     return; 
 };
 
+string calcGroupName; 
+string columnName; 
 
+if(Model.CalculationGroups.Any(cg => cg.GetAnnotation("@AgulloBernat") == "Time Intel Calc Group")) {
+    calcGroupName = Model.CalculationGroups.Where(cg => cg.GetAnnotation("@AgulloBernat") == "Time Intel Calc Group").First().Name;
+    
+}else {
+    calcGroupName = Interaction.InputBox("Provide a name for your Calc Group", "Calc Group Name", "Time Intelligence", 740, 400);
+}; 
 
-string calcGroupName = Interaction.InputBox("Provide a name for your Calc Group", "Calc Group Name", "Time Intelligence", 740, 400);
 if(calcGroupName == "") return;
-//string calcGroupName = "Time Intelligence";
 
-//add the name for the column you want to appear in the calculation group
-string columnName = Interaction.InputBox("Provide a name for your Calc Group Column", "Calc Group Column Name", calcGroupName, 740, 400);
+
+if(Model.CalculationGroups.Any(cg => cg.GetAnnotation("@AgulloBernat") == "Time Intel Calc Group")) {
+    columnName = Model.Tables.Where(cg => cg.GetAnnotation("@AgulloBernat") == "Time Intel Calc Group").First().Columns.First().Name;
+    
+}else {
+    columnName = Interaction.InputBox("Provide a name for your Calc Group Column", "Calc Group Column Name", calcGroupName, 740, 400);
+}; 
+
 if(columnName == "") return;
-//string columnName = "Time Calculation";
 
-string affectedMeasuresTableName = Interaction.InputBox("Provide a name for affected measures table", "Affected Measures Table Name", calcGroupName  + " Affected Measures", 740, 400);
+string affectedMeasuresTableName; 
+
+if(Model.Tables.Any(t => t.GetAnnotation("@AgulloBernat") == "Time Intel Affected Measures Table")) {
+    affectedMeasuresTableName = Model.Tables.Where(t => t.GetAnnotation("@AgulloBernat") == "Time Intel Affected Measures Table").First().Name;
+
+} else {
+    affectedMeasuresTableName = Interaction.InputBox("Provide a name for affected measures table", "Affected Measures Table Name", calcGroupName  + " Affected Measures", 740, 400);
+
+};
+
 if(affectedMeasuresTableName == "") return;
-//string affectedMeasuresTableName = "Time Intelligence Affected Measures"; 
+
+
+if(Model.Tables.Any(t => t.GetAnnotation("@AgulloBernat") == "Time Intel Affected Measures Table")) {
+    affectedMeasuresColumnName = Model.Tables.Where(t => t.GetAnnotation("@AgulloBernat") == "Time Intel Affected Measures Table").First().Columns.First().Name;
+
+} else {
+    affectedMeasuresColumnName = Interaction.InputBox("Provide a name for affected measures column", "Affected Measures Table Column Name", "Measure", 740, 400);
+
+};
+
 
 
 string affectedMeasuresColumnName = Interaction.InputBox("Provide a name for affected measures table column name", "Affected Measures Table Column Name", "Measure", 740, 400);
+
 if(affectedMeasuresColumnName == "") return;
 //string affectedMeasuresColumnName = "Measure"; 
 
@@ -96,10 +127,28 @@ string labelAsFormatStringMeasureName = "Label as format string";
  // '2021-09-24 / B.Agullo / model object selection prompts! 
 var factTable = SelectTable(label: "Select your fact table");
 if(factTable == null) return;
+
 var factTableDateColumn = SelectColumn(factTable.Columns, label: "Select the main date column");
 if(factTableDateColumn == null) return;
 
-var dateTable = SelectTable(label: "Select your date table");
+Table dateTableCandidate = null;
+
+if(Model.Tables.Any
+    (x => x.GetAnnotation("@AgulloBernat") == "Time Intel Date Table" 
+        || x.Name == "Date" 
+        || x.Name == "Calendar")){
+            dateTableCandidate = Model.Tables.Where
+                (x => x.GetAnnotation("@AgulloBernat") == "Time Intel Date Table" 
+                    || x.Name == "Date" 
+                    || x.Name == "Calendar").First();
+
+};
+
+var dateTable = 
+    SelectTable(
+        label: "Select your date table",
+        preselect:dateTableCandidate);
+
 if(dateTable == null) {
     Error("You just aborted the script"); 
     return;
@@ -107,7 +156,21 @@ if(dateTable == null) {
     dateTable.SetAnnotation("@AgulloBernat","Time Intel Date Table");
 }; 
 
-var dateTableDateColumn = SelectColumn(dateTable.Columns, label: "Select the date column");
+
+Column dateTableDateColumnCandidate = null; 
+
+if(dateTable.Columns.Any
+            (x => x.GetAnnotation("@AgulloBernat") == "Time Intel Date Table Date Column" || x.Name == "Date")){
+    dateTableDateColumnCandidate = dateTable.Columns.Where
+        (x => x.GetAnnotation("@AgulloBernat") == "Time Intel Date Table Date Column" || x.Name == "Date").First();
+};
+
+var dateTableDateColumn = 
+    SelectColumn(
+        dateTable.Columns, 
+        label: "Select the date column",
+        preselect: dateTableDateColumnCandidate);
+
 if(dateTableDateColumn == null) {
     Error("You just aborted the script"); 
     return;
@@ -115,8 +178,24 @@ if(dateTableDateColumn == null) {
     dateTableDateColumn.SetAnnotation("@AgulloBernat","Time Intel Date Table Date Column"); 
 }; 
 
-var dateTableYearColumn = SelectColumn(dateTable.Columns, label: "Select the year column");
-if(dateTableYearColumn == null) return;
+Column dateTableYearColumnCandidate = null;
+if(dateTable.Columns.Any(x => x.GetAnnotation("@AgulloBernat") == "Time Intel Date Table Year Column" || x.Name == "Year")){
+    dateTable.Columns.Where
+        (x => x.GetAnnotation("@AgulloBernat") == "Time Intel Date Table Year Column" || x.Name == "Year").First();
+};
+
+var dateTableYearColumn = 
+    SelectColumn(
+        dateTable.Columns, 
+        label: "Select the year column", 
+        preselect:dateTableYearColumnCandidate);
+
+if(dateTableYearColumn == null) {
+    Error("You just abourted the script"); 
+    return;
+} else {
+    dateTableYearColumn.SetAnnotation("@AgulloBernat","Time Intel Date Table Year Column"); 
+};
 
 
 //these names are for internal use only, so no need to be super-fancy, better stick to datpatterns.com model
@@ -136,55 +215,61 @@ string flagExpression = "UNICHAR( 8204 )";
 string calcItemProtection = "<CODE>"; //default value if user has selected no measures
 string calcItemFormatProtection = "<CODE>"; //default value if user has selected no measures
 
+// check if there's already an affected measure table
+if(Model.Tables.Any(t => t.GetAnnotation("@AgulloBernat") == "Time Intel Affected Measures Table")) {
+    //modifying an existing calculated table is not risk-free
+    Info("Make sure to include measure names to the table " + affectedMeasuresTableName);
+} else { 
+    // create calculated table containing all names of affected measures
+    // this is why you need to enable 
+    if(affectedMeasures != "{") { 
+        
+        affectedMeasures = affectedMeasures + "}";
+        
+        string affectedMeasureTableExpression = 
+            "SELECTCOLUMNS(" + affectedMeasures + ",\"" + affectedMeasuresColumnName + "\",[Value])";
 
+        var affectedMeasureTable = 
+            Model.AddCalculatedTable(affectedMeasuresTableName,affectedMeasureTableExpression);
+        
+        affectedMeasureTable.FormatDax(); 
+        affectedMeasureTable.Description = 
+            "Measures affected by " + calcGroupName + " calculation group." ;
+        
+        affectedMeasureTable.SetAnnotation("@AgulloBernat","Time Intel Affected Measures Table"); 
+       
+        // this causes error
+        // affectedMeasureTable.Columns[affectedMeasuresColumnName].SetAnnotation("@AgulloBernat","Time Intel Affected Measures Table Column");
+
+        affectedMeasureTable.IsHidden = true;     
+        
+    };
+};
 
 //if there where selected or preselected measures, prepare protection code for expresion and formatstring
-if(affectedMeasures != "{") { 
-    
-    affectedMeasures = affectedMeasures + "}";
-    
-    string affectedMeasureTableExpression = 
-        "SELECTCOLUMNS(" + affectedMeasures + ",\"" + affectedMeasuresColumnName + "\",[Value])";
+string affectedMeasuresValues = "VALUES('" + affectedMeasuresTableName + "'[" + affectedMeasuresColumnName + "])";
 
-    var affectedMeasureTable = 
-        Model.AddCalculatedTable(affectedMeasuresTableName,affectedMeasureTableExpression);
+calcItemProtection = 
+    "SWITCH(" + 
+    "   TRUE()," + 
+    "   SELECTEDMEASURENAME() IN " + affectedMeasuresValues + "," + 
+    "   <CODE> ," + 
+    "   ISSELECTEDMEASURE([" + labelAsValueMeasureName + "])," + 
+    "   <LABELCODE> ," + 
+    "   SELECTEDMEASURE() " + 
+    ")";
     
-    affectedMeasureTable.FormatDax(); 
-    affectedMeasureTable.Description = 
-        "Measures affected by " + calcGroupName + " calculation group." ;
     
-    affectedMeasureTable.SetAnnotation("@AgulloBernat","Time Intel Affected Measures Table"); 
-   
-    // this causes error
-    // affectedMeasureTable.Columns[affectedMeasuresColumnName].SetAnnotation("@AgulloBernat","Time Intel Affected Measures Table Column");
+calcItemFormatProtection = 
+    "SWITCH(" + 
+    "   TRUE() ," + 
+    "   SELECTEDMEASURENAME() IN " + affectedMeasuresValues + "," + 
+    "   <CODE> ," + 
+    "   ISSELECTEDMEASURE([" + labelAsFormatStringMeasureName + "])," + 
+    "   <LABELCODEFORMATSTRING> ," +
+    "   SELECTEDMEASUREFORMATSTRING() " + 
+    ")";
 
-    affectedMeasureTable.IsHidden = true;     
-    
-
-
-    string affectedMeasuresValues = "VALUES('" + affectedMeasuresTableName + "'[" + affectedMeasuresColumnName + "])";
-    
-    calcItemProtection = 
-        "SWITCH(" + 
-        "   TRUE()," + 
-        "   SELECTEDMEASURENAME() IN " + affectedMeasuresValues + "," + 
-        "   <CODE> ," + 
-        "   ISSELECTEDMEASURE([" + labelAsValueMeasureName + "])," + 
-        "   <LABELCODE> ," + 
-        "   SELECTEDMEASURE() " + 
-        ")";
-        
-        
-    calcItemFormatProtection = 
-        "SWITCH(" + 
-        "   TRUE() ," + 
-        "   SELECTEDMEASURENAME() IN " + affectedMeasuresValues + "," + 
-        "   <CODE> ," + 
-        "   ISSELECTEDMEASURE([" + labelAsFormatStringMeasureName + "])," + 
-        "   <LABELCODEFORMATSTRING> ," +
-        "   SELECTEDMEASUREFORMATSTRING() " + 
-        ")";
-};
     
 string dateColumnWithTable = "'" + dateTableName + "'[" + dateTableDateColumnName + "]"; 
 string yearColumnWithTable = "'" + dateTableName + "'[" + dateTableYearColumnName + "]"; 
@@ -226,34 +311,37 @@ calcGroup.Columns[columnName].Description = "Select value(s) from this column to
 calcGroup.Columns[columnName].SetAnnotation("@AgulloBernat","Time Intel Calc Group Column"); 
 
 
-//set variable for the date table 
-//Table dateTable = Model.Tables[dateTableName];
+//Only create them if not in place yet (reruns)
+if(!Model.Tables[dateTableName].Columns.Any(C => C.GetAnnotation("@AgulloBernat") == "Date with Data Column")){
+    string DateWithSalesCalculatedColumnExpression = 
+        dateColumnWithTable + " <= MAX ( " + factDateColumnWithTable + ")";
+
+    Column dateWithDataColumn = dateTable.AddCalculatedColumn(dateWithSalesColumnName,DateWithSalesCalculatedColumnExpression);
+    dateWithDataColumn.SetAnnotation("@AgulloBernat","Date with Data Column");
+};
+
+if(!Model.Tables[dateTableName].Measures.Any(M => M.Name == ShowValueForDatesMeasureName)) {
+    string ShowValueForDatesMeasureExpression = 
+        "VAR LastDateWithData = " + 
+        "    CALCULATE ( " + 
+        "        MAX (  " + factDateColumnWithTable + " ), " + 
+        "        REMOVEFILTERS () " +
+        "    )" +
+        "VAR FirstDateVisible = " +
+        "    MIN ( " + dateColumnWithTable + " ) " + 
+        "VAR Result = " +  
+        "    FirstDateVisible <= LastDateWithData " +
+        "RETURN " + 
+        "    Result ";
+
+    var ShowValueForDatesMeasure = dateTable.AddMeasure(ShowValueForDatesMeasureName,ShowValueForDatesMeasureExpression); 
+
+    ShowValueForDatesMeasure.FormatDax();
+};
 
 
-string DateWithSalesCalculatedColumnExpression = 
-    dateColumnWithTable + " <= MAX ( " + factDateColumnWithTable + ")";
 
-dateTable.AddCalculatedColumn(dateWithSalesColumnName,DateWithSalesCalculatedColumnExpression);
-
-
-string ShowValueForDatesMeasureExpression = 
-    "VAR LastDateWithData = " + 
-    "    CALCULATE ( " + 
-    "        MAX (  " + factDateColumnWithTable + " ), " + 
-    "        REMOVEFILTERS () " +
-    "    )" +
-    "VAR FirstDateVisible = " +
-    "    MIN ( " + dateColumnWithTable + " ) " + 
-    "VAR Result = " +  
-    "    FirstDateVisible <= LastDateWithData " +
-    "RETURN " + 
-    "    Result ";
-
-var ShowValueForDatesMeasure = dateTable.AddMeasure(ShowValueForDatesMeasureName,ShowValueForDatesMeasureExpression); 
-
-ShowValueForDatesMeasure.FormatDax();
-
-
+//defining expressions and formatstring for each calc item
 string CY = 
     "/*CY*/ " + 
     "SELECTEDMEASURE()";
@@ -489,6 +577,90 @@ string MATvsMATminus1pct =
 
 string MATvsMATminus1pctlabel = "\"MAT vs MAT-1 (%)\"";
 
+string MMT = String.Format(
+        @"/*MMT*/
+        IF(
+            [{0}],
+            CALCULATE( SELECTEDMEASURE( ), DATESINPERIOD( {1}, MAX( {1} ), -1, MONTH ) )
+        )",ShowValueForDatesMeasureName,dateColumnWithTable);
+
+string MMTlabel = "\"MMT\"";
+
+string MMTminus1 = String.Format(
+        @"/*MMT*/
+        IF(
+            [{0}],
+            CALCULATE( SELECTEDMEASURE( ), DATESINPERIOD( {1}, LASTDATE( DATEADD( {1}, -1, MONTH ) ), -1, MONTH ) )
+        )",ShowValueForDatesMeasureName,dateColumnWithTable);
+
+string MMTminus1label = "\"MMT-1\"";
+
+string MMTvsMMTminus1 = 
+ "        /*MMT vs MMT-1*/\r\n" + 
+ "        VAR MMT = " + MMT + "\r\n" +
+ "        VAR MMT_1 =" + MMTminus1 + "\r\n" +
+ "        RETURN \r\n" + 
+ "            IF( ISBLANK( MMT ) || ISBLANK( MMT_1 ), BLANK(), MMT - MMT_1 )";
+
+string MMTvsMMTminus1label = "\"MMT vs MMT-1\"";
+
+string MMTvsMMTminus1pct = 
+ "        /*MMT vs MMT-1(%)*/" + 
+ "        VAR MMT = " + MMT+ "\r\n" +
+ "        VAR MMT_1 =" + MMTminus1 + "\r\n" +
+ "        RETURN" + 
+ "            IF(" + 
+ "                ISBLANK( MMT ) || ISBLANK( MMT_1 )," + 
+ "                BLANK()," + 
+ "                DIVIDE( MMT - MMT_1, MMT_1 )" + 
+ "            )"; 
+
+string MMTvsMMTminus1pctlabel = "\"MMT vs MMT-1 (%)\"";
+
+
+
+string MWT = String.Format(
+        @"/*MWT*/
+        IF(
+            [{0}],
+            CALCULATE( SELECTEDMEASURE( ), DATESINPERIOD( {1}, MAX( {1} ), -7, DAY ) )
+        )",ShowValueForDatesMeasureName,dateColumnWithTable);
+
+string MWTlabel = "\"MWT\"";
+
+string MWTminus1 = String.Format(
+        @"/*MWT*/
+        IF(
+            [{0}],
+            CALCULATE( SELECTEDMEASURE( ), DATESINPERIOD( {1}, LASTDATE( DATEADD( {1}, -7, DAY ) ), -7, DAY ) )
+        )",ShowValueForDatesMeasureName,dateColumnWithTable);
+
+string MWTminus1label = "\"MWT-1\"";
+
+string MWTvsMWTminus1 = 
+ "        /*MWT vs MWT-1*/\r\n" + 
+ "        VAR MWT = " + MWT + "\r\n" +
+ "        VAR MWT_1 =" + MWTminus1 + "\r\n" +
+ "        RETURN \r\n" + 
+ "            IF( ISBLANK( MWT ) || ISBLANK( MWT_1 ), BLANK(), MWT - MWT_1 )";
+
+string MWTvsMWTminus1label = "\"MWT vs MWT-1\"";
+
+string MWTvsMWTminus1pct = 
+ "        /*MWT vs MWT-1(%)*/" + 
+ "        VAR MWT = " + MWT+ "\r\n" +
+ "        VAR MWT_1 =" + MWTminus1 + "\r\n" +
+ "        RETURN" + 
+ "            IF(" + 
+ "                ISBLANK( MWT ) || ISBLANK( MWT_1 )," + 
+ "                BLANK()," + 
+ "                DIVIDE( MWT - MWT_1, MWT_1 )" + 
+ "            )"; 
+
+string MWTvsMWTminus1pctlabel = "\"MWT vs MWT-1 (%)\"";
+
+
+
 string defFormatString = "SELECTEDMEASUREFORMATSTRING()";
 
 //if the flag expression is already present in the format string, do not change it, otherwise apply % format. 
@@ -515,6 +687,14 @@ string[ , ] calcItems =
         {"MAT-1",   MATminus1,  defFormatString,    "Moving Anual Total -1 year", MATminus1label},
         {"MAT vs MAT-1", MATvsMATminus1, defFormatString, "Moving Anual Total vs Moving Anual Total -1 year", MATvsMATminus1label},
         {"MAT vs MAT-1(%)", MATvsMATminus1pct, pctFormatString, "Moving Anual Total vs Moving Anual Total -1 year (%)", MATvsMATminus1pctlabel},
+        {"MMT",     MMT,        defFormatString,    "Moving Monthly Total",       MMTlabel},
+        {"MMT-1",   MMTminus1,  defFormatString,    "Moving Monthly Total -1 month", MMTminus1label},
+        {"MMT vs MMT-1", MMTvsMMTminus1, defFormatString, "Moving Monthly Total vs Moving Monthly Total -1 month", MMTvsMMTminus1label},
+        {"MMT vs MMT-1(%)", MMTvsMMTminus1pct, pctFormatString, "Moving Monthly Total vs Moving Monthly Total -1 month (%)", MMTvsMMTminus1pctlabel},
+        {"MWT",     MWT,        defFormatString,    "Moving Weekly Total",       MWTlabel},
+        {"MWT-1",   MWTminus1,  defFormatString,    "Moving Weekly Total -1 week", MWTminus1label},
+        {"MWT vs MWT-1", MWTvsMWTminus1, defFormatString, "Moving Weekly Total vs Moving Weekly Total -1 month", MWTvsMWTminus1label},
+        {"MWT vs MWT-1(%)", MWTvsMWTminus1pct, pctFormatString, "Moving Weekly Total vs Moving Weekly Total -1 week (%)", MWTvsMWTminus1pctlabel}
     };
 
     
