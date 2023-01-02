@@ -42,6 +42,18 @@ using System.Windows.Forms;
 Model Model; // *** Needed for C# scripting, remove in TE3 ***
 TabularEditor.Shared.Interaction.Selection Selected; // *** Needed for C# scripting, remove in TE3 ***
 
+#r "C:\Program Files\Tabular Editor 3\TabularEditor3.exe" // *** Needed for C# scripting, remove in TE3 ***
+#r "C:\Program Files (x86)\Tabular Editor 3\TabularEditor3.exe" // *** Needed for C# scripting, remove in TE3 ***
+#r "System.IO"
+#r "Microsoft.VisualBasic"
+
+using TabularEditor.TOMWrapper; // *** Needed for C# scripting, remove in TE3 ***
+using TabularEditor.Scripting; // *** Needed for C# scripting, remove in TE3 ***
+using System.IO;
+using Microsoft.VisualBasic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Windows.Forms;
 
 
 Func<IList<string>, string, string> SelectString = (IList<string> listText, string titleText) =>
@@ -98,7 +110,8 @@ var TemplateExtendedProperties = new string[] {
     "DateYearColumn",
     "FactTable",
     "FactDateColumn",
-    "GlobalMeasure"
+    "GlobalMeasure",
+    "DefaultRollingDays"
 };
 var ChooseInput = (new string[] {"Yes","No"});
 
@@ -110,6 +123,7 @@ var stepDateYearColumn = "DateYearColumn";
 var stepFactTable = "FactTable";
 var stepFactDateColumn = "FactDateColumn";
 var stepGlobalMeasure = "GlobalMeasure";
+var stepDefaultDays =  "DefaultRollingDays";
 
 var sb = new System.Text.StringBuilder();
 var createdb = new System.Text.StringBuilder();
@@ -166,7 +180,7 @@ else
         Model.SetExtendedProperty(stepFactDateColumn, FactDateColumn.DaxObjectFullName, ExtendedPropertyType.String);
     }
 }
-if (stepGlobalMeasure == null)
+if (Model.GetExtendedProperty(stepGlobalMeasure) == null)
 {
 var GlobalMeasures = SelectMeasure(label: "Select your Global Measure");   
 Model.SetExtendedProperty(stepGlobalMeasure, GlobalMeasures.DaxObjectFullName, ExtendedPropertyType.String);
@@ -180,3 +194,14 @@ else
         Model.SetExtendedProperty(stepGlobalMeasure, GlobalMeasures.DaxObjectFullName, ExtendedPropertyType.String);
     }
 }
+if (Model.GetExtendedProperty(stepDefaultDays) == null)
+{
+var DefaultDays = Interaction.InputBox("How many Default Days for Rolling?","Rolling Days", "Labels", 740, 400);
+Model.SetExtendedProperty(stepDefaultDays, DefaultDays, ExtendedPropertyType.String);
+}
+else
+{
+var DefaultDays = Interaction.InputBox("How many Default Days for Rolling?","Rolling Days", Model.GetExtendedProperty(stepDefaultDays), 740, 400);
+Model.SetExtendedProperty(stepDefaultDays, DefaultDays, ExtendedPropertyType.String);
+}
+
