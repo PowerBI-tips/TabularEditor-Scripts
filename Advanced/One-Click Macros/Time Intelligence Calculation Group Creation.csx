@@ -1,6 +1,6 @@
 #r "Microsoft.VisualBasic"
 using Microsoft.VisualBasic;
-//
+                //
 // CHANGELOG:
 // '2021-05-01 / B.Agullo / 
 // '2021-05-17 / B.Agullo / added affected measure table
@@ -9,6 +9,7 @@ using Microsoft.VisualBasic;
 // '2021-09-23 / B.Agullo / added code to prompt for parameters (code credit to Daniel Otykier) 
 // '2021-09-27 / B.Agullo / added code for general name 
 // '2022-10-11 / B.Agullo / added MMT and MWT calc item groups
+// '2023-01-24 / B.Agullo / added Date Range Measure and completed dynamic label for existing items
 //
 // by Bernat Agulló
 // twitter: @AgulloBernat
@@ -339,6 +340,12 @@ labelAsValueMeasure.Description = "Use this measure to show the year evaluated i
 var labelAsFormatStringMeasure = calcGroup.AddMeasure(labelAsFormatStringMeasureName, "0");
 labelAsFormatStringMeasure.Description = "Use this measure to show the year evaluated in charts";
 
+Measure dateRangeMeasure = calcGroup.AddMeasure("Date Range", expression: @"FORMAT( MIN( 'Date'[Date] ), ""d-MMM-yy"", ""en-US"" ) & "" to ""
+        & FORMAT( MAX( 'Date'[Date] ), ""d-MMM-yy"", ""en-US"" )");
+
+dateRangeMeasure.Description = "This measure is used to display the dynamic label of Moving total calc items. Do not delete.";
+
+
 //by default the calc group has a column called Name. If this column is still called Name change this in line with specfied variable
 if (calcGroup.Columns.Contains("Name"))
 {
@@ -577,7 +584,21 @@ string MAT =
  "        )";
 
 
-string MATlabel = "\"MAT\"";
+string MATlabel =
+    "        /*TAM*/" +
+ "        IF (" +
+    "    [" + ShowValueForDatesMeasureName + "], " +
+ "            CALCULATE (" +
+ "                " + dateRangeMeasure.DaxObjectFullName + "," +
+ "                DATESINPERIOD (" +
+ "                    " + dateColumnWithTable + " ," +
+ "                    MAX ( " + dateColumnWithTable + "  )," +
+ "                    -1," +
+ "                    YEAR" +
+ "                )" +
+ "                " +
+ "            )" +
+ "        )";
 
 string MATminus1 =
  "        /*TAM*/" +
@@ -594,7 +615,21 @@ string MATminus1 =
  "            )" +
  "        )";
 
-string MATminus1label = "\"MAT-1\"";
+string MATminus1label = 
+    "/*MAT-1*/" +
+ "        IF (" +
+ "            [" + ShowValueForDatesMeasureName + "], " +
+ "            CALCULATE (" +
+ "                " + dateRangeMeasure.DaxObjectFullName + "," +
+ "                DATESINPERIOD (" +
+ "                    " + dateColumnWithTable + "," +
+ "                    LASTDATE( DATEADD( " + dateColumnWithTable + ", - 1, YEAR ) )," +
+ "                    -1," +
+ "                    YEAR" +
+ "                )" +
+ "            )" +
+ "        )";
+;
 
 string MATvsMATminus1 =
  "        /*MAT vs MAT-1*/\r\n" +
@@ -603,7 +638,12 @@ string MATvsMATminus1 =
  "        RETURN \r\n" +
  "            IF( ISBLANK( MAT ) || ISBLANK( MAT_1 ), BLANK(), MAT - MAT_1 )";
 
-string MATvsMATminus1label = "\"MAT vs MAT-1\"";
+string MATvsMATminus1label = "/*MAT vs MAT-1*/" +
+    
+ "        VAR MAT = " + MATlabel + "\r\n" +
+ "        VAR MAT_1 =" + MATminus1label + "\r\n" +
+ "        RETURN \r\n" +
+ "            IF( ISBLANK( MAT ) || ISBLANK( MAT_1 ), BLANK(), MAT & \" vs \" & MAT_1 )";
 
 string MATvsMATminus1pct =
  "        /*MAT vs MAT-1(%)*/" +
@@ -616,7 +656,11 @@ string MATvsMATminus1pct =
  "                DIVIDE( MAT - MAT_1, MAT_1 )" +
  "            )";
 
-string MATvsMATminus1pctlabel = "\"MAT vs MAT-1 (%)\"";
+string MATvsMATminus1pctlabel = "/*MAT vs MAT-1 (%)*/" +
+                 "        VAR MAT = " + MATlabel + "\r\n" +
+ "        VAR MAT_1 =" + MATminus1label + "\r\n" +
+ "        RETURN \r\n" +
+ "            IF( ISBLANK( MAT ) || ISBLANK( MAT_1 ), BLANK(), MAT & \" vs \" & MAT_1 & \" (%)\" )"; 
 
 string MMT = String.Format(
         @"/*MMT*/
@@ -625,7 +669,12 @@ IF(
 CALCULATE( SELECTEDMEASURE( ), DATESINPERIOD( {1}, MAX( {1} ), -1, MONTH ) )
 )", ShowValueForDatesMeasureName, dateColumnWithTable);
 
-string MMTlabel = "\"MMT\"";
+string MMTlabel = String.Format(
+        @"/*MMT*/
+IF(
+[{0}],
+CALCULATE( {2}, DATESINPERIOD( {1}, MAX( {1} ), -1, MONTH ) )
+)", ShowValueForDatesMeasureName, dateColumnWithTable, dateRangeMeasure.DaxObjectFullName);
 
 string MMTminus1 = String.Format(
         @"/*MMT*/
@@ -634,7 +683,13 @@ IF(
 CALCULATE( SELECTEDMEASURE( ), DATESINPERIOD( {1}, LASTDATE( DATEADD( {1}, -1, MONTH ) ), -1, MONTH ) )
 )", ShowValueForDatesMeasureName, dateColumnWithTable);
 
-string MMTminus1label = "\"MMT-1\"";
+string MMTminus1label = "/*MMT-1*/" +
+    String.Format(
+        @"/*MMT*/
+IF(
+[{0}],
+CALCULATE( {2}, DATESINPERIOD( {1}, LASTDATE( DATEADD( {1}, -1, MONTH ) ), -1, MONTH ) )
+)", ShowValueForDatesMeasureName, dateColumnWithTable, dateRangeMeasure.DaxObjectFullName);
 
 string MMTvsMMTminus1 =
  "        /*MMT vs MMT-1*/\r\n" +
@@ -643,7 +698,12 @@ string MMTvsMMTminus1 =
  "        RETURN \r\n" +
  "            IF( ISBLANK( MMT ) || ISBLANK( MMT_1 ), BLANK(), MMT - MMT_1 )";
 
-string MMTvsMMTminus1label = "\"MMT vs MMT-1\"";
+string MMTvsMMTminus1label =
+    "        /*MMT vs MMT-1*/\r\n" +
+ "        VAR MMT = " + MMTlabel + "\r\n" +
+ "        VAR MMT_1 =" + MMTminus1label + "\r\n" +
+ "        RETURN \r\n" +
+ "            IF( ISBLANK( MMT ) || ISBLANK( MMT_1 ), BLANK(), MMT & \" vs \" & MMT_1 )"; 
 
 string MMTvsMMTminus1pct =
  "        /*MMT vs MMT-1(%)*/" +
@@ -656,7 +716,12 @@ string MMTvsMMTminus1pct =
  "                DIVIDE( MMT - MMT_1, MMT_1 )" +
  "            )";
 
-string MMTvsMMTminus1pctlabel = "\"MMT vs MMT-1 (%)\"";
+string MMTvsMMTminus1pctlabel =
+    "        /*MMT vs MMT-1(%)*/" +
+ "        VAR MMT = " + MMTlabel + "\r\n" +
+ "        VAR MMT_1 =" + MMTminus1label + "\r\n" +
+ "        RETURN" +
+ "            IF( ISBLANK( MMT ) || ISBLANK( MMT_1 ), BLANK(), MMT & \" vs \" & MMT_1  & \" (%)\")";
 
 
 
@@ -667,7 +732,14 @@ IF(
 CALCULATE( SELECTEDMEASURE( ), DATESINPERIOD( {1}, MAX( {1} ), -7, DAY ) )
 )", ShowValueForDatesMeasureName, dateColumnWithTable);
 
-string MWTlabel = "\"MWT\"";
+string MWTlabel = "/*MWT*/" +
+    
+    String.Format(
+        @"/*MWT*/
+IF(
+[{0}],
+CALCULATE( {2}, DATESINPERIOD( {1}, MAX( {1} ), -7, DAY ) )
+)", ShowValueForDatesMeasureName, dateColumnWithTable,dateRangeMeasure.DaxObjectFullName); ;
 
 string MWTminus1 = String.Format(
         @"/*MWT*/
@@ -676,7 +748,13 @@ IF(
 CALCULATE( SELECTEDMEASURE( ), DATESINPERIOD( {1}, LASTDATE( DATEADD( {1}, -7, DAY ) ), -7, DAY ) )
 )", ShowValueForDatesMeasureName, dateColumnWithTable);
 
-string MWTminus1label = "\"MWT-1\"";
+string MWTminus1label = "/*MWT-1*/" +
+    String.Format(
+        @"/*MWT*/
+IF(
+[{0}],
+CALCULATE( {2}, DATESINPERIOD( {1}, LASTDATE( DATEADD( {1}, -7, DAY ) ), -7, DAY ) )
+)", ShowValueForDatesMeasureName, dateColumnWithTable, dateRangeMeasure.DaxObjectFullName);
 
 string MWTvsMWTminus1 =
  "        /*MWT vs MWT-1*/\r\n" +
@@ -685,7 +763,12 @@ string MWTvsMWTminus1 =
  "        RETURN \r\n" +
  "            IF( ISBLANK( MWT ) || ISBLANK( MWT_1 ), BLANK(), MWT - MWT_1 )";
 
-string MWTvsMWTminus1label = "\"MWT vs MWT-1\"";
+string MWTvsMWTminus1label = 
+    "        /*MWT vs MWT-1*/\r\n" +
+ "        VAR MWT = " + MWTlabel + "\r\n" +
+ "        VAR MWT_1 =" + MWTminus1label + "\r\n" +
+ "        RETURN \r\n" +
+ "            IF( ISBLANK( MWT ) || ISBLANK( MWT_1 ), BLANK(), MWT & \" vs \" & MWT_1 )"; 
 
 string MWTvsMWTminus1pct =
  "        /*MWT vs MWT-1(%)*/" +
@@ -698,7 +781,12 @@ string MWTvsMWTminus1pct =
  "                DIVIDE( MWT - MWT_1, MWT_1 )" +
  "            )";
 
-string MWTvsMWTminus1pctlabel = "\"MWT vs MWT-1 (%)\"";
+string MWTvsMWTminus1pctlabel = 
+    "/*MWT vs MWT-1 (%)*/" +
+ "        VAR MWT = " + MWTlabel + "\r\n" +
+ "        VAR MWT_1 =" + MWTminus1label + "\r\n" +
+ "        RETURN \r\n" +
+ "            IF( ISBLANK( MWT ) || ISBLANK( MWT_1 ), BLANK(), MWT & \" vs \" & MWT_1 & \" (%)\")";
 
 
 
