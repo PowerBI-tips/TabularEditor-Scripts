@@ -822,7 +822,7 @@ string[,] calcItems =
 {"MMT vs MMT-1(%)", MMTvsMMTminus1pct, pctFormatString, "Moving Monthly Total vs Moving Monthly Total -1 month (%)", MMTvsMMTminus1pctlabel},
 {"MWT",     MWT,        defFormatString,    "Moving Weekly Total",       MWTlabel},
 {"MWT-1",   MWTminus1,  defFormatString,    "Moving Weekly Total -1 week", MWTminus1label},
-{"MWT vs MWT-1", MWTvsMWTminus1, defFormatString, "Moving Weekly Total vs Moving Weekly Total -1 month", MWTvsMWTminus1label},
+{"MWT vs MWT-1", MWTvsMWTminus1, defFormatString, "Moving Weekly Total vs Moving Weekly Total -1 week", MWTvsMWTminus1label},
 {"MWT vs MWT-1(%)", MWTvsMWTminus1pct, pctFormatString, "Moving Weekly Total vs Moving Weekly Total -1 week (%)", MWTvsMWTminus1pctlabel}
 };
 
