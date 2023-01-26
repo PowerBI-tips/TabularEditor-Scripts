@@ -7,6 +7,7 @@ using System.Windows.Forms;
 
 /* DYNAMIC HEADER FIELD PARAMETER SCRIPT */ 
 
+/* see https://www.esbrina-ba.com/dynamic-headers-in-power-bi-sort-of/ */
 /* select measures and execute, you will need to run it twice */
 /* first time to create aux calc group, second time to actually create measuree*/
 /* remove aux calc group before going to production, do the right thing */
