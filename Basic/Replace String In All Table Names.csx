@@ -1,5 +1,5 @@
 // Title: Replace String In All Table Names.csx
-// Author: @JamesDBartlett3
+// Author: @JamesDBartlett3@techhub.social
 // Description: Renames all tables in the model, replacing one string with another string
 
 var oldTableNameString = "";
