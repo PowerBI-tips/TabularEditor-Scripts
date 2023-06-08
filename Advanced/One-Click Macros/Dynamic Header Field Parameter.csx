@@ -173,8 +173,7 @@ foreach (Measure m in Selected.Measures)
                 }
 
 
-                Output(measureNameQuery);
-
+               
                 using (var reader = Model.Database.ExecuteReader(measureNameQuery))
                 {
                     while (reader.Read())
@@ -220,7 +219,7 @@ foreach (Measure m in Selected.Measures)
                         /*retrive the formatstring from the query*/
                         string formatString = reader.GetValue(0).ToString();
 
-                        Output(formatString);
+                       
 
 
 
@@ -413,19 +412,18 @@ public static class Fx
             if (returnNullIfNoTablesFound)
             {
                 if (showErrorIfNoTablesFound) Error(errorMessage);
-                Output("No tables found");
                 return table;
             } 
             else
             {
-                Output("returnNullIfNoTablesFound is false");
+                
                 table =  SelectTable(tables: model.Tables, label: label);
             }
             
         }
         else if (tables.Count() == 1 && !skipDialogIfSingleMatch)
         {
-            Output("tables.Count() == 1 && !skipDialogIfSingleMatch");
+            
             table = SelectTable(tables: model.Tables, preselect: tables.First(), label: label);
         }
         else if (tables.Count() == 1 && skipDialogIfSingleMatch)
@@ -441,12 +439,12 @@ public static class Fx
             }
             else if (showOnlyMatchingTables)
             {
-                Output("showOnlyMatchingTables");
+                
                 table = SelectTable(tables: tables, preselect: tables.First(), label: label);
             }
             else
             {
-                Output("else");
+               
                 table = SelectTable(tables: model.Tables, preselect: tables.First(), label: label);
             }
             
