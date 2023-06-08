@@ -1,4 +1,5 @@
 //Select the desired table to store all data quality measures
+// 2023-02-15 / B.Agulló / Added useRelationship in the expression to check also inactive relationships
 
 
 string overallCounterExpression = "";
@@ -46,7 +47,8 @@ foreach (var r in Model.Relationships)
         string orphanCountExpression =
             "CALCULATE("
                 + "SUMX(VALUES(" + manyColumn.DaxObjectFullName + "),1),"
-                + oneColumn.DaxObjectFullName + " = BLANK()"
+                + oneColumn.DaxObjectFullName + " = BLANK(),"
+                + "USERELATIONSHIP(" + manyColumn.DaxObjectFullName + "," + oneColumn.DaxObjectFullName + ")"
             + ")";
         string orphanMeasureName =
             manyColumn.Name + " not mapped in " + manyColumn.Table.Name;
