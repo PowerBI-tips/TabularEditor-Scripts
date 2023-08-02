@@ -1,5 +1,5 @@
 // Title: ReplaceDatasetSourceDataflowIDs.csx
-// Author: @JamesDBartlett3
+// Author: @JamesDBartlett3@techhub.social
 // Description: Replace the source DataflowID & WorkspaceID on all partitions in the model
 
 var oldWorkspaceId = "";

@@ -1,5 +1,5 @@
 // Title: Nuke All Implicit Measures.csx
-// Author: @JamesDBartlett3
+// Author: @JamesDBartlett3@techhub.social
 // Description: Uses two methods to disable all Implicit Measures in the model
 
 // 1. Set "Discourage Implicit Measures" option in Model = true
