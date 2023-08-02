@@ -1,5 +1,5 @@
 // Title: ReplaceStringAcrossAllPowerQueries.csx
-// Author: @JamesDBartlett3
+// Author: @JamesDBartlett3@techhub.social
 // Description: Replaces a string in PowerQuery on all partitions in the model
 
 var oldPQString = "";
